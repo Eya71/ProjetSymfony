@@ -1,20 +1,240 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello PanierController!{% endblock %}
+{% block title %}
+    Mon panier
+{% endblock %}
+
+{% block stylesheets %}
+
+    <link rel="stylesheet"
+          href="{{ asset('css/style.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ asset('css/mes_demandes.css') }}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+    {% include 'partials/_header_client.html.twig' %}
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/GMI/PhpstormProjects/ProjetSymfony/src/Controller/PanierController.php</code></li>
-        <li>Your template at <code>C:/Users/GMI/PhpstormProjects/ProjetSymfony/templates/panier/index.html.twig</code></li>
-    </ul>
-</div>
+    {% include 'partials/_sidebar_client.html.twig' %}
+
+    <main class="panier-page">
+
+        <div class="panier-layout">
+
+            <div class="panier-left">
+
+                <section class="content-card panier-card">
+
+                    <div class="section-head">
+
+                        <div>
+
+                            <h2>
+
+                                Mon panier
+
+                            </h2>
+
+                            <p>
+
+                                {{ items|length }} produit(s)
+
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {% if items is not empty %}
+
+                        <div class="panier-list">
+
+                            {% for item in items %}
+
+                                <article class="panier-item">
+
+                                    <div class="panier-image">
+
+                                        <img src="{{ asset(item.image_path) }}"
+                                             alt="">
+
+                                    </div>
+
+                                    <div class="panier-content">
+
+                                        <span class="product-badge">
+
+                                            {{ item.categorie }}
+
+                                        </span>
+
+                                        <h3>
+
+                                            {{ item.nom_produit }}
+
+                                        </h3>
+
+                                        <p>
+
+                                            {{ item.description }}
+
+                                        </p>
+
+                                        <strong class="price">
+
+                                            {{ item.prix }} DT
+
+                                        </strong>
+
+                                        <p>
+
+                                            <strong>
+
+                                                Sous-total :
+
+                                            </strong>
+
+                                            {{ item.prix * item.quantite }} DT
+
+                                        </p>
+
+                                        <div class="panier-controls">
+
+                                            <form action="{{ path('panier_update', {'id': item.id}) }}"
+                                                  method="post">
+
+                                                <input type="number"
+                                                       name="quantite"
+                                                       value="{{ item.quantite }}"
+                                                       min="1">
+
+                                                <button class="secondary-btn">
+
+                                                    Modifier
+
+                                                </button>
+
+                                            </form>
+
+                                            <form action="{{ path('panier_delete', {'id': item.id}) }}"
+                                                  method="post">
+
+                                                <button class="delete-btn">
+
+                                                    Supprimer
+
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+
+                                </article>
+
+                            {% endfor %}
+
+                        </div>
+
+                    {% else %}
+
+                        <p>
+
+                            Votre panier est vide.
+
+                        </p>
+
+                    {% endif %}
+
+                </section>
+
+            </div>
+
+            <div class="panier-right">
+
+                <div class="resume-card">
+
+                    <h3>
+
+                        Récapitulatif
+
+                    </h3>
+
+                    <div class="resume-line">
+
+                        <span>
+
+                            Sous-total
+
+                        </span>
+
+                        <span>
+
+                            {{ total }} DT
+
+                        </span>
+
+                    </div>
+
+                    <div class="resume-line">
+
+                        <span>
+
+                            Livraison
+
+                        </span>
+
+                        <span>
+
+                            Calculé plus tard
+
+                        </span>
+
+                    </div>
+
+                    <div class="resume-line total">
+
+                        <span>
+
+                            Total
+
+                        </span>
+
+                        <span>
+
+                            {{ total }} DT
+
+                        </span>
+
+                    </div>
+
+                    <form action="#"
+                          method="post">
+
+                        <button type="submit"
+                                class="btn-checkout">
+
+                            Valider mon panier
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    {% include 'partials/_footer.html.twig' %}
+
 {% endblock %}
