@@ -9,20 +9,6 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class ProduitController extends AbstractController
 {
-    #[Route('/produits', name: 'produit_index')]
-    public function index(
-        ProduitRepository $produitRepository
-    ): Response {
-
-        $produits = $produitRepository->findAll();
-
-        return $this->render(
-            'index.html.twig',
-            [
-                'produits' => $produits
-            ]
-        );
-    }
 
     #[Route('/produit/{id}', name: 'produit_details')]
     public function details(

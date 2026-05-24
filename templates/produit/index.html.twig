@@ -1,22 +1,27 @@
 {% extends 'base.html.twig' %}
 
 {% block title %}
-    Produits
+    Détails produit
 {% endblock %}
 
 {% block stylesheets %}
 
+    <link rel="stylesheet"
+          href="{{ asset('css/style.css') }}">
 
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link rel="stylesheet" href="{{asset('css/produit_details.css')}}">
+    <link rel="stylesheet"
+          href="{{ asset('css/produit_details.css') }}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
 {% endblock %}
 
 {% block body %}
 
-    {% include 'partials/_header.html.twig' %}
+    {% include 'partials/_header_client.html.twig' %}
 
-    {% include 'partials/_sidebar.html.twig' %}
+    {% include 'partials/_sidebar_client.html.twig' %}
 
     <div class="main-container">
 
@@ -31,11 +36,11 @@
 
             <div class="product-right">
 
-            <span class="category">
+                <span class="category">
 
-                {{ produit.categorie }}
+                    {{ produit.categorie }}
 
-            </span>
+                </span>
 
                 <h1>
 
@@ -51,19 +56,11 @@
 
                 </p>
 
-                <form action="#"
+                <form action="{{ path('panier_add', {'id': produit.id}) }}"
                       method="post">
-
-                    <input type="hidden"
-                           name="id_produit"
-                           value="{{ produit.id }}">
-
-                    <button class="btn-cart">
-
-                        Ajouter au panier
-
+                    <button type="submit" class="btn-cart">
+                        ajouter panier
                     </button>
-
                 </form>
 
                 <div class="detail-actions">
@@ -129,4 +126,3 @@
     <script src="{{ asset('js/menu.js') }}"></script>
 
 {% endblock %}
-
