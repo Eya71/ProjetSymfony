@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+{% block stylesheets %}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+{% endblock %}
+<div class="top-banner">
+    <div class="banner-track">
+
+        <span>livraison sur toute la <strong>Tunisie</strong> • </span>
+        <span>Chez nous, poster vos demandes et cherchez la meilleure offre pour vous</span>
+
+        <span>livraison sur toute la <strong>Tunisie</strong> • </span>
+        <span>Chez nous, poster vos demandes et cherchez la meilleure offre pour vous</span>
+
+    </div>
+</div>
+
+<header class="top-header simple-client-header">
+
+    <button id="menuBtn"
+            class="menu-btn"
+            type="button"
+            aria-label="Ouvrir le menu">
+
+        <i class="fa-solid fa-align-justify"></i>
+
+    </button>
+
+    <a class="logo"
+       href="{{ path('produit_index') }}">
+
+        <img class="logo-img"
+             src="{{ asset('files_profil/logo.png') }}"
+             alt="Importy">
+
+    </a>
+
+    <div class="search">
+
+        <i class="fa fa-search"></i>
+
+        <input type="text"
+               id="productSearch"
+               placeholder="Rechercher un produit">
+
+    </div>
+
+    <div class="icons quick-actions">
+
+        <a href="{{ path('mon_compte') }}"
+           class="icon-item">
+
+            <i class="fa-regular fa-user"></i>
+            <span>Mon compte</span>
+
+        </a>
+
+        <a href="{{ path('panier_index') }}"
+           class="icon-item">
+
+            <i class="fa-solid fa-bag-shopping"></i>
+            <span>Panier</span>
+
+        </a>
+
+        <a href="{{ path('demande_index') }}"
+           class="icon-item">
+
+            <i class="fa-solid fa-plus"></i>
+            <span>Demande</span>
+
+        </a>
+
+    </div>
+
+</header>

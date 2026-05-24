@@ -4,260 +4,281 @@
 
 {% block body %}
 
-<div class="cart-toast" id="cartToast">Produit ajoute dans le panier.</div>
-<div class="top-banner">
-    <div class="banner-track">
-        <span>livraison sur toute la <strong>Tunisie</strong>• </span>
-        <span>Chez nous,poster votre demandes et chercher la meilleure offre pour vous</span>
-        <span>livraison sur toute la <strong>Tunisie</strong> •</span>
-        <span>Chez nous,poster votre demandes et chercher la meilleure offre pour vous</span>
-        <span>livraison sur toute la <strong>Tunisie</strong> •</span>
-        <span>Chez nous,poster votre demandes et chercher la meilleure offre pour vous</span>
+    <div class="cart-toast" id="cartToast">Produit ajoute dans le panier.</div>
 
+    <div class="top-banner">
+        <div class="banner-track">
+            <span>livraison sur toute la <strong>Tunisie</strong> • </span>
+            <span>Chez nous, poster votre demandes et chercher la meilleure offre pour vous</span>
+            <span>livraison sur toute la <strong>Tunisie</strong> • </span>
+            <span>Chez nous, poster votre demandes et chercher la meilleure offre pour vous</span>
+        </div>
     </div>
-</div>
-<header class="top-header">
 
-    <button id="menuBtn" class="menu-btn">
-        <i class="fa-solid fa-align-justify"></i>
-    </button>
+    {% block top_header %}
+        <header class="top-header">
 
-    <a class="logo" aria-label="Importy - Accueil">
-        <img class="logo-img" src="/files_profil/logo.png" alt="Importy">
+            <button id="menuBtn" class="menu-btn">
+                <i class="fa-solid fa-align-justify"></i>
+            </button>
+
+            <a class="logo" aria-label="Importy - Accueil">
+                <img class="logo-img" src="/files_profil/logo.png" alt="Importy">
+            </a>
+
+            <div class="search">
+                <i class="fa fa-search"></i>
+                <input type="text" id="homeProductSearch" placeholder="Rechercher un produit, une marque...">
+            </div>
+
+            <div class="icons">
+                <a href="#" class="icon-item" id="sidebarPanierTrigger">
+                    <i class="fa-solid fa-bag-shopping" style="color:#B197FC;"></i>
+                    <span>Votre Panier</span>
+                </a>
+
+                <a href="login.php" class="icon-item">
+                    <i class="fa-regular fa-user" style="color:#74C0FC;"></i>
+                    <span>Se connecter</span>
+                </a>
+            </div>
+
+        </header>
+    {% endblock %}
+
+    {% block side_menu %}
+
+        <div class="hero">
+            <img src="../files_profil/img.png" alt="promo" class="hero-img">
+        </div>
+
+        <div class="overlay" id="overlay"></div>
+
+        <div class="side-menu" id="sideMenu">
+
+            <div class="side-header">
+                <a class="brand" aria-label="Importy - Accueil">
+                    <img class="brand-img" src="/files_profil/logo.png" alt="Importy">
+                </a>
+
+                <i class="fa-solid fa-xmark" id="closeMenu"></i>
+            </div>
+
+            <div class="section">
+                <h4>Compte</h4>
+
+                <a href="login.php">
+                    <i class="fa-regular fa-user"></i> Login
+                </a>
+            </div>
+
+        </div>
+
+    {% endblock %}
+
+    {% block main %}
+
+        <main class="client-page simple-client-page">
+
+            <section class="client-content full-width-content">
+
+                <section class="content-card" id="produits">
+
+                    <div class="section-head">
+                        <h2>Produits</h2>
+                        <p>{{ produits|length }} resultat(s)</p>
+                    </div>
+
+                    <div class="products-grid" id="productsGrid">
+
+                        {% if produits is not empty %}
+
+                            {% for prod in produits %}
+
+                                <article class="product-card searchable-product">
+
+                            <span class="product-badge">
+                                {{ prod.categorie ?? 'Sans categorie' }}
+                            </span>
+
+                                    <div class="product-image">
+
+                                        {% if prod.image_path is not empty %}
+                                            <img
+                                                    src="{{ asset(prod.image_path) }}"
+                                                    alt="{{ prod.nom_produit ?? 'Produit' }}"
+                                            >
+                                        {% else %}
+                                            <i class="fa-solid fa-box"></i>
+                                        {% endif %}
+
+                                    </div>
+
+                                    <h3>{{ prod.nom_produit ?? 'Produit' }}</h3>
+
+                                    <p>
+                                        <strong>Prix :</strong>
+                                        {{ prod.prix ?? '0' }} DT
+                                    </p>
+
+                                    <div class="product-actions">
+
+                                        <a
+                                                class="small-btn"
+                                                href="{{ path('produit_details', {
+                                                    id: prod.id_produit
+                                                }) }}"
+                                        >
+                                            Voir produit
+                                        </a>
+
+                                        <button
+                                                class="primary-btn product-cart-btn open-index-sidebar"
+                                                type="button"
+                                        >
+                                            Ajouter au panier
+                                        </button>
+
+                                    </div>
+
+                                </article>
+
+                            {% endfor %}
+
+                        {% else %}
+
+                            <p class="empty-products">
+                                Aucun produit trouve dans la base de donnees.
+                            </p>
+
+                        {% endif %}
+
+                    </div>
+
+                </section>
+
+            </section>
+
+        </main>
+
+    {% endblock %}
+
+    <a href="#" class="floating-cart-btn" id="floatingSidebarPanierTrigger" aria-label="Voir le panier">
+        <i class="fa-solid fa-bag-shopping"></i>
     </a>
 
-    <div class="search">
-        <i class="fa fa-search"></i>
-        <input type="text" id="homeProductSearch" placeholder="Rechercher un produit, une marque...">
-    </div>
+    <script>
 
-    <div class="icons">
-        <a href="#" class="icon-item" id="sidebarPanierTrigger">
-            <i class="fa-solid fa-bag-shopping" style="color:#B197FC;"></i>
-            <span>Votre Panier</span>
-        </a>
+        const menuBtn = document.getElementById('menuBtn');
+        const sideMenu = document.getElementById('sideMenu');
+        const closeMenu = document.getElementById('closeMenu');
+        const overlay = document.getElementById('overlay');
 
+        const sidebarPanierTrigger = document.getElementById('sidebarPanierTrigger');
+        const floatingSidebarPanierTrigger = document.getElementById('floatingSidebarPanierTrigger');
 
+        const sidebarCartButtons = document.querySelectorAll('.open-index-sidebar');
 
+        const homeSearchInput = document.getElementById('homeProductSearch');
+        const homeProductCards = document.querySelectorAll('.searchable-product');
 
+        const cartToast = document.getElementById('cartToast');
 
-        <a href="login.php" class="icon-item">
-            <i class="fa-regular fa-user" style="color:#74C0FC;"></i>
-            <span>Se connecter</span>
-        </a>
-    </div>
-</header>
-<div class="hero">
-    <img src="../files_profil/img.png" alt="promo" class="hero-img">
-</div>
+        function openMenu() {
+            sideMenu.classList.add('active');
+            overlay.style.display = 'block';
+        }
 
+        function closeAll() {
+            sideMenu.classList.remove('active');
+            overlay.style.display = 'none';
+        }
 
-<div class="overlay" id="overlay"></div>
+        if (menuBtn && closeMenu && overlay) {
+            menuBtn.addEventListener('click', openMenu);
+            closeMenu.addEventListener('click', closeAll);
+            overlay.addEventListener('click', closeAll);
+        }
 
-<div class="side-menu" id="sideMenu">
-    <div class="side-header">
-        <a class="brand" aria-label="Importy - Accueil">
-            <img class="brand-img" src="/files_profil/logo.png" alt="Importy">
-        </a>
-        <i class="fa-solid fa-xmark" id="closeMenu"></i>
-    </div>
+        function showCartToast(message) {
 
-    <div class="section">
-        <h4>Compte</h4>
+            if (!cartToast) return;
 
-        <a href="login.php"><i class="fa-regular fa-user"></i> Login</a>
-    </div>
-</div>
+            cartToast.textContent = message;
 
-<main class="client-page simple-client-page">
-    <section class="client-content full-width-content">
-        <section class="content-card" id="produits">
-            <div class="section-head">
-                <h2>Produits</h2>
-                <p>{{ produits|length}}  resultat(s)</p>
-            </div>
+            cartToast.classList.add('visible');
 
-            <div class="products-grid" id="productsGrid">
-                {% if produits is not empty %}
-                {% for prod in produits%}
-                <article class="product-card searchable-product">
-                    <span class="product-badge"><?php echo htmlspecialchars($prod['categorie'] ?? 'Sans categorie'); ?></span>
-                    <div class="product-image">
-                        <?php $productImage = resolveProductImagePath($prod['image_path'] ?? ''); ?>
-                        <?php if ($productImage !== ''): ?>
-                        <img src="<?php echo htmlspecialchars($productImage); ?>" alt="<?php echo htmlspecialchars($prod['nom_produit'] ?? 'Produit'); ?>">
-                        <?php else: ?>
-                        <i class="fa-solid fa-box"></i>
-                        <?php endif; ?>
-                    </div>
-                    <h3><?php echo htmlspecialchars($prod['nom_produit'] ?? 'Produit'); ?></h3>
-                    <p><strong>Prix : </strong><?php echo htmlspecialchars($prod['prix'] ?? '0'); ?> DT</p>
+            window.clearTimeout(showCartToast.timeoutId);
 
-                    <div class="product-actions">
-                        <a class="small-btn" href="../php/produit_details.php?id=<?php echo urlencode($prod['id_produit'] ?? ''); ?>&return_to=<?php echo urlencode('index.php'); ?>">Voir produit</a>
-                        <button class="primary-btn product-cart-btn open-index-sidebar" type="button">Ajouter au panier</button>
-                    </div>
-                </article>
-                <?php endforeach; ?>
-                <?php else: ?>
-                <p class="empty-products">Aucun produit trouve dans la base de donnees.</p>
-                <?php endif; ?>
-            </div>
-        </section>
-    </section>
-</main>
+            showCartToast.timeoutId = window.setTimeout(function () {
+                cartToast.classList.remove('visible');
+            }, 2200);
+        }
 
-<a href="#" class="floating-cart-btn" id="floatingSidebarPanierTrigger" aria-label="Voir le panier">
-    <i class="fa-solid fa-bag-shopping"></i>
-</a>
+        if (sidebarPanierTrigger) {
 
-<script>
-    const menuBtn = document.getElementById('menuBtn');
-    const sideMenu = document.getElementById('sideMenu');
-    const closeMenu = document.getElementById('closeMenu');
-    const overlay = document.getElementById('overlay');
-    const sidebarPanierTrigger = document.getElementById('sidebarPanierTrigger');
-    const floatingSidebarPanierTrigger = document.getElementById('floatingSidebarPanierTrigger');
-    const demandeTrigger = document.getElementById('demandeTrigger');
-    const notificationTrigger = document.getElementById('notificationTrigger');
-    const sidebarCartButtons = document.querySelectorAll('.open-index-sidebar');
-    const homeSearchInput = document.getElementById('homeProductSearch');
-    const homeProductCards = document.querySelectorAll('.searchable-product');
-    const cartToast = document.getElementById('cartToast');
+            sidebarPanierTrigger.addEventListener('click', function (event) {
 
-    function openMenu() {
-        sideMenu.classList.add('active');
-        overlay.style.display = 'block';
-    }
+                event.preventDefault();
 
-    function closeAll() {
-        sideMenu.classList.remove('active');
-        overlay.style.display = 'none';
-    }
+                openMenu();
 
-    if (menuBtn && closeMenu && overlay) {
-        menuBtn.addEventListener('click', openMenu);
-        closeMenu.addEventListener('click', closeAll);
-        overlay.addEventListener('click', closeAll);
-    }
+                showCartToast('Connectez-vous pour continuer.');
+            });
+        }
 
-    if (sidebarPanierTrigger) {
-        sidebarPanierTrigger.addEventListener('click', function (event) {
-            event.preventDefault();
-            openMenu();
-            showCartToast('Connectez-vous pour continuer.');
-        });
-    }
+        if (floatingSidebarPanierTrigger) {
 
-    if (floatingSidebarPanierTrigger) {
-        floatingSidebarPanierTrigger.addEventListener('click', function (event) {
-            event.preventDefault();
-            openMenu();
-            showCartToast('Connectez-vous pour continuer.');
-        });
-    }
+            floatingSidebarPanierTrigger.addEventListener('click', function (event) {
 
-    if (demandeTrigger) {
-        demandeTrigger.addEventListener('click', function (event) {
-            event.preventDefault();
-            showCartToast('Connectez-vous pour continuer.');
-        });
-    }
+                event.preventDefault();
 
-    if (notificationTrigger) {
-        notificationTrigger.addEventListener('click', function (event) {
-            event.preventDefault();
-            showCartToast('Connectez-vous pour continuer.');
-        });
-    }
+                openMenu();
 
-    sidebarCartButtons.forEach(function (button) {
-        button.addEventListener('click', function () {
-            openMenu();
-        });
-    });
+                showCartToast('Connectez-vous pour continuer.');
+            });
+        }
 
-    if (homeSearchInput) {
-        homeSearchInput.addEventListener('input', function () {
-            const query = this.value.toLowerCase().trim();
+        sidebarCartButtons.forEach(function (button) {
 
-            homeProductCards.forEach(function (card) {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(query) ? '' : 'none';
+            button.addEventListener('click', function () {
+
+                openMenu();
+
+                showCartToast('Connectez-vous pour continuer.');
             });
         });
-    }
 
-    function showCartToast(message) {
-        if (!cartToast) return;
-        cartToast.textContent = message;
-        cartToast.classList.add('visible');
-        window.clearTimeout(showCartToast.timeoutId);
-        showCartToast.timeoutId = window.setTimeout(function () {
-            cartToast.classList.remove('visible');
-        }, 2200);
-    }
+        if (homeSearchInput) {
 
-    sidebarCartButtons.forEach(function (button) {
-        button.addEventListener('click', function () {
-            showCartToast('Connectez-vous pour continuer.');
-        });
-    });
-</script>
+            homeSearchInput.addEventListener('input', function () {
 
+                const query = this.value.toLowerCase().trim();
 
-<div class="about-site">
-    <h4><strong>A propos de nous</strong></h4>
-    <p>
-        Importy est un site de vente en ligne qui permet de découvrir et d’acheter
-        facilement différents produits dans plusieurs catégories comme la beauté, la mode,
-        l’électroménager ou encore les produits technologiques.
-        Le but est de proposer une plateforme simple et agréable à utiliser,
-        où l’utilisateur peut rechercher des articles.Ce qui distingue Importy,
-        c’est qu'avec cette platforme, les utilisateurs peuvent également poster des demandes spécifiques pour des produits qu’ils recherchent,
-        permettant ainsi aux vendeurs de proposer des offres personnalisées.
+                homeProductCards.forEach(function (card) {
 
-        Importy vise à offrir une expérience d’achat fluide et sécurisée, avec un large choix de produits
-        pour répondre aux attentes de tous les clients.
+                    const text = card.textContent.toLowerCase();
 
-    </p>
-</div>
+                    card.style.display = text.includes(query) ? '' : 'none';
+                });
+            });
+        }
 
-<div class="services">
+    </script>
 
-    <div class="service">
-        <div class="icon"><i class="fa-solid fa-store"></i></div>
-        <div>
-            <h4>pour les vendeurs</h4>
-            <p>Proposez vos produits et gérez votre activité en toute simplicité.</p>
-        </div>
-    </div>
+    {% block partie_inf %}
 
-    <div class="service">
-        <div class="icon"><i class="fa-solid fa-truck"></i></div>
-        <div>
-            <h4>Livraison standard offerte</h4>
-            <p>just verifier votre adresse dans le compte</p>
+        <div class="about-site">
+
+            <h4><strong>A propos de nous</strong></h4>
+
+            <p>
+                Importy est un site de vente en ligne qui permet de découvrir et d’acheter
+                facilement différents produits.
+            </p>
 
         </div>
-    </div>
 
-    <div class="service">
-        <div class="icon"><i class="fa-regular fa-credit-card"></i></div>
-        <div>
-            <h4>Paiements a la livraison</h4>
-            <p>vous payez le livreur lorsque vous recevez votre commande</p>
+    {% endblock %}
 
-        </div>
-    </div>
-
-    <div class="service">
-        <div class="icon"><i class="fa-solid fa-undo"></i></div>
-        <div>
-            <h4>Retours</h4>
-            <p>sous 14 jours</p>
-        </div>
-    </div>
-
-</div>
 {% endblock %}
