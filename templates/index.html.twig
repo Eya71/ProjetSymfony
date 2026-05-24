@@ -23,7 +23,7 @@
     </button>
 
     <a class="logo" aria-label="Importy - Accueil">
-        <img class="logo-img" src="/files_profil/logo.png" alt="Importy">
+        <img class="logo-img" src="{{ asset('files_profil/logo.png') }}" alt="Importy">
     </a>
 
     <div class="search">
@@ -37,10 +37,6 @@
             <span>Votre Panier</span>
         </a>
 
-
-
-
-
         <a href="login.php" class="icon-item">
             <i class="fa-regular fa-user" style="color:#74C0FC;"></i>
             <span>Se connecter</span>
@@ -48,7 +44,7 @@
     </div>
 </header>
 <div class="hero">
-    <img src="../files_profil/img.png" alt="promo" class="hero-img">
+    <img src="{{ asset('files_profil/img.png') }}" alt="promo" class="hero-img">
 </div>
 
 
@@ -79,29 +75,28 @@
 
             <div class="products-grid" id="productsGrid">
                 {% if produits is not empty %}
-                {% for prod in produits%}
+                {% for prod in produits %}
                 <article class="product-card searchable-product">
-                    <span class="product-badge"><?php echo htmlspecialchars($prod['categorie'] ?? 'Sans categorie'); ?></span>
+                    <span class="product-badge">{{ prod.categorie ?: 'Sans catégorie' }}</span>
                     <div class="product-image">
-                        <?php $productImage = resolveProductImagePath($prod['image_path'] ?? ''); ?>
-                        <?php if ($productImage !== ''): ?>
-                        <img src="<?php echo htmlspecialchars($productImage); ?>" alt="<?php echo htmlspecialchars($prod['nom_produit'] ?? 'Produit'); ?>">
-                        <?php else: ?>
+                        {% if prod.imagePath %}
+                        <img src="{{ asset(prod.imagePath) }}" alt="{{ prod.nomProduit ?: 'Produit' }}">
+                        {% else %}
                         <i class="fa-solid fa-box"></i>
-                        <?php endif; ?>
+                        {% endif %}
                     </div>
-                    <h3><?php echo htmlspecialchars($prod['nom_produit'] ?? 'Produit'); ?></h3>
-                    <p><strong>Prix : </strong><?php echo htmlspecialchars($prod['prix'] ?? '0'); ?> DT</p>
+                    <h3>{{ prod.nomProduit ?: 'Produit' }} </h3>
+                    <p><strong>Prix : </strong>{{ prod.prix ?: '0' }} DT</p>
 
                     <div class="product-actions">
-                        <a class="small-btn" href="../php/produit_details.php?id=<?php echo urlencode($prod['id_produit'] ?? ''); ?>&return_to=<?php echo urlencode('index.php'); ?>">Voir produit</a>
+                        <a class="small-btn" href="{{ path('produit_show', {'id': prod.id}) }}">Voir produit</a>
                         <button class="primary-btn product-cart-btn open-index-sidebar" type="button">Ajouter au panier</button>
                     </div>
                 </article>
-                <?php endforeach; ?>
-                <?php else: ?>
-                <p class="empty-products">Aucun produit trouve dans la base de donnees.</p>
-                <?php endif; ?>
+                {% endfor %}
+                {% else %}
+                    <p class="empty-products">Aucun produit trouvé dans la base de données.</p>
+                {% endif %}
             </div>
         </section>
     </section>
@@ -110,100 +105,6 @@
 <a href="#" class="floating-cart-btn" id="floatingSidebarPanierTrigger" aria-label="Voir le panier">
     <i class="fa-solid fa-bag-shopping"></i>
 </a>
-
-<script>
-    const menuBtn = document.getElementById('menuBtn');
-    const sideMenu = document.getElementById('sideMenu');
-    const closeMenu = document.getElementById('closeMenu');
-    const overlay = document.getElementById('overlay');
-    const sidebarPanierTrigger = document.getElementById('sidebarPanierTrigger');
-    const floatingSidebarPanierTrigger = document.getElementById('floatingSidebarPanierTrigger');
-    const demandeTrigger = document.getElementById('demandeTrigger');
-    const notificationTrigger = document.getElementById('notificationTrigger');
-    const sidebarCartButtons = document.querySelectorAll('.open-index-sidebar');
-    const homeSearchInput = document.getElementById('homeProductSearch');
-    const homeProductCards = document.querySelectorAll('.searchable-product');
-    const cartToast = document.getElementById('cartToast');
-
-    function openMenu() {
-        sideMenu.classList.add('active');
-        overlay.style.display = 'block';
-    }
-
-    function closeAll() {
-        sideMenu.classList.remove('active');
-        overlay.style.display = 'none';
-    }
-
-    if (menuBtn && closeMenu && overlay) {
-        menuBtn.addEventListener('click', openMenu);
-        closeMenu.addEventListener('click', closeAll);
-        overlay.addEventListener('click', closeAll);
-    }
-
-    if (sidebarPanierTrigger) {
-        sidebarPanierTrigger.addEventListener('click', function (event) {
-            event.preventDefault();
-            openMenu();
-            showCartToast('Connectez-vous pour continuer.');
-        });
-    }
-
-    if (floatingSidebarPanierTrigger) {
-        floatingSidebarPanierTrigger.addEventListener('click', function (event) {
-            event.preventDefault();
-            openMenu();
-            showCartToast('Connectez-vous pour continuer.');
-        });
-    }
-
-    if (demandeTrigger) {
-        demandeTrigger.addEventListener('click', function (event) {
-            event.preventDefault();
-            showCartToast('Connectez-vous pour continuer.');
-        });
-    }
-
-    if (notificationTrigger) {
-        notificationTrigger.addEventListener('click', function (event) {
-            event.preventDefault();
-            showCartToast('Connectez-vous pour continuer.');
-        });
-    }
-
-    sidebarCartButtons.forEach(function (button) {
-        button.addEventListener('click', function () {
-            openMenu();
-        });
-    });
-
-    if (homeSearchInput) {
-        homeSearchInput.addEventListener('input', function () {
-            const query = this.value.toLowerCase().trim();
-
-            homeProductCards.forEach(function (card) {
-                const text = card.textContent.toLowerCase();
-                card.style.display = text.includes(query) ? '' : 'none';
-            });
-        });
-    }
-
-    function showCartToast(message) {
-        if (!cartToast) return;
-        cartToast.textContent = message;
-        cartToast.classList.add('visible');
-        window.clearTimeout(showCartToast.timeoutId);
-        showCartToast.timeoutId = window.setTimeout(function () {
-            cartToast.classList.remove('visible');
-        }, 2200);
-    }
-
-    sidebarCartButtons.forEach(function (button) {
-        button.addEventListener('click', function () {
-            showCartToast('Connectez-vous pour continuer.');
-        });
-    });
-</script>
 
 
 <div class="about-site">
@@ -260,4 +161,5 @@
     </div>
 
 </div>
+    <script src="{{ asset('js/index.js') }}" ></script>
 {% endblock %}
