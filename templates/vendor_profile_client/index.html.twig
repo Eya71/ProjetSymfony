@@ -1,0 +1,244 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Profil vendeur - {{ vendor.username }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/vendorProfileClient.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    <main class="vendor-profile-page">
+        <div class="vendor-wrap">
+
+            {% for message in app.flashes('success') %}
+                <div class="account-message success-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="account-message error-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <section class="vendor-hero">
+                <div class="vendor-main-card">
+
+                    <div class="vendor-avatar-col">
+                        {% if vendor.idPhoto %}
+                            <img
+                                    src="{{ asset(vendor.idPhoto) }}"
+                                    alt="Photo du vendeur {{ vendor.username }}"
+                                    class="vendor-avatar"
+                            >
+                        {% else %}
+                            <img
+                                    src="{{ asset('images/default-user.png') }}"
+                                    alt="Photo vendeur par défaut"
+                                    class="vendor-avatar"
+                            >
+                        {% endif %}
+                    </div>
+
+                    <div class="vendor-info-col">
+                        <span class="vendor-topline">Profil vendeur</span>
+
+                        <h1>{{ vendor.username }}</h1>
+
+                        <div class="vendor-badges">
+                        <span class="soft-badge">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            Membre depuis 30/03/2026
+                        </span>
+
+                            <span class="soft-badge success-badge">
+                            <i class="fa-solid fa-star"></i>
+                            Vendeur actif
+                        </span>
+                        </div>
+
+                        <div class="vendor-contact-grid">
+                            <div class="info-box">
+                                <span class="info-label">Email</span>
+                                <span class="info-value">{{ vendor.email }}</span>
+                            </div>
+
+                            <div class="info-box">
+                                <span class="info-label">Adresse</span>
+                                <span class="info-value">{{ vendor.adresse }}</span>
+                            </div>
+
+                            <div class="info-box">
+                                <span class="info-label">Téléphone</span>
+                                <span class="info-value">{{ vendor.numTel }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="vendor-rating-col">
+                        <div class="rating-panel">
+                            <div class="rating-caption">Note moyenne</div>
+
+                            <div class="rating-big">
+                                {{ averageRating }}/5
+                            </div>
+
+                            <div class="rating-visual">
+                                {% for i in 1..5 %}
+                                    {% if i <= averageRating %}
+                                        <i class="fa-solid fa-star"></i>
+                                    {% else %}
+                                        <i class="fa-regular fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+
+                            <div class="rating-sub">
+                                {{ totalReviews }} avis client
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <section class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-cart-shopping"></i>
+                    </div>
+                    <div class="stat-value">{{ commandesRecues }}</div>
+                    <div class="stat-label">Commandes reçues</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div class="stat-value">{{ commandesTerminees }}</div>
+                    <div class="stat-label">Commandes terminées</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-handshake"></i>
+                    </div>
+                    <div class="stat-value">{{ dealsAcceptes }}</div>
+                    <div class="stat-label">Deals acceptés</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fa-solid fa-box-open"></i>
+                    </div>
+                    <div class="stat-value">{{ produitsPublies }}</div>
+                    <div class="stat-label">Produits publiés</div>
+                </div>
+
+            </section>
+
+            <section class="content-card">
+                <div class="section-title-row">
+                    <div>
+                        <h2>Avis clients</h2>
+                        <p>Les retours laissés par les clients de ce vendeur.</p>
+                    </div>
+                </div>
+
+                {% if reviews is empty %}
+                    <div class="empty-box">
+                        Aucun avis pour le moment.
+                    </div>
+                {% else %}
+                    <div class="reviews-list">
+                        {% for review in reviews %}
+                            <article class="review-item">
+                                <div class="review-item-head">
+                                    <div>
+                                        <div class="review-user">
+                                            {{ review.clientUsername.username }}
+                                        </div>
+
+                                        <div class="review-rating">
+                                            {% for i in 1..5 %}
+                                                {% if i <= review.rating %}
+                                                    <i class="fa-solid fa-star"></i>
+                                                {% else %}
+                                                    <i class="fa-regular fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+
+                                    <div class="review-date">
+                                        {{ review.createdAt ? review.createdAt|date('d/m/Y') : '' }}
+                                    </div>
+                                </div>
+
+                                <p class="review-text">
+                                    {{ review.commentaire }}
+                                </p>
+                            </article>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </section>
+
+            <section class="content-card">
+                <div class="section-title-row">
+                    <div>
+                        <h2>Laisser un nouvel avis</h2>
+                        <p>Évaluez votre expérience avec ce vendeur.</p>
+                    </div>
+                </div>
+
+                {% if reviewForm %}
+                    {{ form_start(reviewForm, {'attr': {'class': 'review-form'}}) }}
+
+                    <div class="field-block">
+                        {{ form_label(reviewForm.id_deal) }}
+                        {{ form_widget(reviewForm.id_deal) }}
+                        {{ form_errors(reviewForm.id_deal) }}
+                    </div>
+
+                    <div class="field-block">
+                        <label>Votre note</label>
+
+                        <div class="star-rating">
+                            {% for child in reviewForm.rating|reverse %}
+                                {{ form_widget(child) }}
+                                <label for="{{ child.vars.id }}">★</label>
+                            {% endfor %}
+                        </div>
+
+                        {{ form_errors(reviewForm.rating) }}
+                    </div>
+
+                    <div class="field-block">
+                        {{ form_label(reviewForm.commentaire) }}
+                        {{ form_widget(reviewForm.commentaire) }}
+                        {{ form_errors(reviewForm.commentaire) }}
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit">
+                            Publier l’avis
+                        </button>
+                    </div>
+
+                    {{ form_end(reviewForm) }}
+                {% else %}
+                    <div class="empty-box">
+                        Vous ne pouvez pas encore laisser un avis pour ce vendeur.
+                    </div>
+                {% endif %}
+            </section>
+
+        </div>
+    </main>
+
+{% endblock %}

@@ -19,10 +19,10 @@ class DealRequest
     #[ORM\ManyToOne(inversedBy: 'dealRequests')]
     private ?Demande $id_demande = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     private ?Client $client_username = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     private ?Vendeur $vendeur_username = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
