@@ -1311,6 +1311,7 @@ select {
 
 .btn-checkout:hover {
     background: #222;
+<<<<<<< HEAD
 }
 
 .orders-shortcut-card {
@@ -1585,3 +1586,6 @@ select {
         text-align: left;
     }
 }
+=======
+}
+>>>>>>> 643353b4f0414133758fa03fc071da9feab196e3
