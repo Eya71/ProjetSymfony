@@ -1,0 +1,77 @@
+{% extends 'partials/client_layout.html.twig' %}
+{% block stylesheets %}
+
+    {{ parent() }}
+
+    <link rel="stylesheet"
+          href="{{ asset('css/demande.css') }}">
+
+
+{% endblock %}
+{% block page_title %} Mes demandes {% endblock %}
+{% block page_content %}
+{% block page_content %}
+
+    <div class="top-actions">
+
+        <span class="count-pill">
+
+            {{ demandes|length }} demande(s)
+
+        </span>
+
+    </div>
+
+    <div class="container">
+
+        {% for demande in demandes %}
+
+            <div class="card">
+
+                <img src="{{ asset(demande.imagePath) }}"
+                     alt="{{ demande.nomProduit }}">
+
+                <h3>
+
+                    {{ demande.nomProduit }}
+
+                </h3>
+
+                <p>
+
+                    {{ demande.createdAt|date('d/m/Y') }}
+
+                </p>
+
+                <p class="etat">
+
+                    {{ demande.etat }}
+
+                </p>
+
+            </div>
+
+        {% else %}
+
+            <div class="empty-state">
+
+                <p>
+
+                    Vous n'avez encore aucune demande.
+
+                </p>
+
+                <a class="add-btn"
+                   href="{{ path('demande_index') }}">
+
+                    Publier ma première demande
+
+                </a>
+
+            </div>
+
+        {% endfor %}
+
+    </div>
+
+{% endblock %}

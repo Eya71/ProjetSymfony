@@ -44,7 +44,7 @@ final class ProduitController extends AbstractController
             4
         );
         return $this->render(
-            'produit/details.html.twig',
+            'produit/index.html.twig',
             [
                 'produit' => $produit,
                 'produits_similaires' => $produitsSimilaires
