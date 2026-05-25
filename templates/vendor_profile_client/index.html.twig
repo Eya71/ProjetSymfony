@@ -51,7 +51,12 @@
                         <div class="vendor-badges">
                         <span class="soft-badge">
                             <i class="fa-solid fa-calendar-days"></i>
-                            Membre depuis 30/03/2026
+                            Membre depuis
+                            {% if vendor.createdAt %}
+                                {{ vendor.createdAt|date('d/m/Y') }}
+                            {% else %}
+                                date non disponible
+                            {% endif %}
                         </span>
 
                             <span class="soft-badge success-badge">

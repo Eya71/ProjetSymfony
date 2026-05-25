@@ -48,7 +48,8 @@ class ReviewType extends AbstractType
                 ],
             ]);
     }
-
+#data_class = le formulaire remplit un objet Review
+#reviewable_deals = option spéciale utilisée seulement pour afficher les deals
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([

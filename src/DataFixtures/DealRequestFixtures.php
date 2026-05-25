@@ -31,16 +31,38 @@ class DealRequestFixtures extends Fixture implements DependentFixtureInterface
             throw new \Exception('Vendeur mohamedabbes introuvable. Charge d’abord VendeurFixtures.');
         }
 
-        $deal = new DealRequest();
-        $deal->setClientUsername($client);
-        $deal->setVendeurUsername($vendeur);
-        $deal->setPrixPropose('480.00');
-        $deal->setMessage('Je suis intéressée par ce produit.');
-        $deal->setCreatedAt(new \DateTimeImmutable());
-        $deal->setClientSeenAt(new \DateTimeImmutable());
-        $deal->setVendeurSeenAt(new \DateTimeImmutable());
+        /*
+         * Deal 1 accepté
+         * Celui-ci peut être noté si aucun avis n'existe encore pour ce deal.
+         */
+        $deal1 = new DealRequest();
+        $deal1->setClientUsername($client);
+        $deal1->setVendeurUsername($vendeur);
+        $deal1->setPrixPropose('480.00');
+        $deal1->setMessage('Je suis intéressée par la ceinture coach.');
+        $deal1->setStatus('accepté');
+        $deal1->setCreatedAt(new \DateTimeImmutable());
+        $deal1->setClientSeenAt(new \DateTimeImmutable());
+        $deal1->setVendeurSeenAt(new \DateTimeImmutable());
 
-        $manager->persist($deal);
+        $manager->persist($deal1);
+
+        /*
+         * Deal 2 accepté
+         * Celui-ci permet de tester que le formulaire affiche plusieurs deals.
+         */
+        $deal2 = new DealRequest();
+        $deal2->setClientUsername($client);
+        $deal2->setVendeurUsername($vendeur);
+        $deal2->setPrixPropose('2000.00');
+        $deal2->setMessage('Je souhaite négocier le prix du Dyson Airwrap.');
+        $deal2->setStatus('accepté');
+        $deal2->setCreatedAt(new \DateTimeImmutable());
+        $deal2->setClientSeenAt(new \DateTimeImmutable());
+        $deal2->setVendeurSeenAt(new \DateTimeImmutable());
+
+        $manager->persist($deal2);
+
         $manager->flush();
     }
 

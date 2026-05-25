@@ -45,6 +45,8 @@ class Vendeur
     #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'vendeur_username')]
     private Collection $reviews;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $created_at = null;
     public function __construct()
     {
         $this->produits = new ArrayCollection();
@@ -184,6 +186,18 @@ class Vendeur
                 $review->setVendeurUsername(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    {
+        $this->created_at = $created_at;
 
         return $this;
     }
