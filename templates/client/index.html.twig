@@ -1,0 +1,159 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}IMPORTY : Interface Client{% endblock %}
+
+{% block body %}
+    <div class="cart-toast" id="cartToast">Produit ajoute dans le panier.</div>
+
+    <div class="top-banner">
+        <div class="banner-track">
+            <span>livraison sur toute la <strong>Tunisie</strong> • </span>
+            <span>Chez nous, poster vos demandes et cherchez la meilleure offre pour vous</span>
+            <span>livraison sur toute la <strong>Tunisie</strong> •</span>
+            <span>Chez nous, poster vos demandes et cherchez la meilleure offre pour vous</span>
+            <span>livraison sur toute la <strong>Tunisie</strong> •</span>
+            <span>Chez nous, poster vos demandes et cherchez la meilleure offre pour vous</span>
+        </div>
+    </div>
+
+    <header class="top-header simple-client-header">
+        <button id="menuBtn" class="menu-btn" type="button" aria-label="Ouvrir le menu">
+            <i class="fa-solid fa-align-justify"></i>
+        </button>
+
+        <a class="logo" aria-label="Importy - Accueil">
+            <img class="logo-img" src="{{ asset('files_profil/logo.png') }}" alt="Importy">
+        </a>
+
+        <div class="search">
+            <i class="fa fa-search"></i>
+            <input type="text" id="productSearch" placeholder="Rechercher un produit dans la base de donnees...">
+        </div>
+
+        <div class="icons quick-actions">
+            <a href="#" class="icon-item">
+                <i class="fa-regular fa-user" style="color:#B197FC;"></i>
+                <span>Mon compte</span>
+            </a>
+
+            <a href="{{ path('panier_index') }}" class="icon-item">
+                <i class="fa-solid fa-bag-shopping" style="color:#B197FC;"></i>
+                <span>Panier</span>
+            </a>
+
+            <a href="#" class="icon-item">
+                <i class="fa-solid fa-plus" style="color:#74C0FC;"></i>
+                <span>Demande</span>
+            </a>
+
+            <a href="#" class="icon-item">
+                <i class="fa-solid fa-list-check" style="color:#74C0FC;"></i>
+                <span>Mes demandes</span>
+            </a>
+
+            <a href="#" class="icon-item">
+                <i class="fa-solid fa-bell" style="color:#74C0FC;"></i>
+                <span>Notification</span>
+                {% if notifCount > 0 %}
+                    <span class="badge">{{ notifCount }}</span>
+                {% endif %}
+            </a>
+
+            <a href="#" class="icon-item">
+                <i class="fa-solid fa-envelope" style="color:#B197FC;"></i>
+                <span>Messages</span>
+                {% if messageCount > 0 %}
+                    <span class="badge">{{ messageCount }}</span>
+                {% endif %}
+            </a>
+        </div>
+    </header>
+
+    <div class="hero">
+        <img src="{{ asset('files_profil/img.png') }}" alt="promo" class="hero-img">
+    </div>
+
+    <div class="overlay" id="overlay" onclick="window.importySidebarClose && window.importySidebarClose()"></div>
+
+    <aside class="side-menu client-side-menu" id="sideMenu" aria-hidden="true">
+        <div class="side-header">
+            <a class="brand" aria-label="Importy - Accueil">
+                <img class="brand-img" src="{{ asset('files_profil/logo.png') }}" alt="Importy">
+            </a>
+            <button class="menu-close-btn" id="closeMenu" type="button" aria-label="Fermer le menu" onclick="window.importySidebarClose && window.importySidebarClose()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="section">
+            <h4>Navigation</h4>
+            <a href="#"><i class="fa-regular fa-user"></i> Mon compte</a>
+            <a href="{{ path('panier_index') }}"><i class="fa-solid fa-bag-shopping"></i> Panier</a>
+            <a href="#"><i class="fa-solid fa-plus"></i> Demande</a>
+            <a href="#"><i class="fa-solid fa-list-check"></i> Mes demandes</a>
+            <a href="#"><i class="fa-solid fa-bell"></i> Notification</a>
+            <a href="#"><i class="fa-solid fa-envelope"></i> Message</a>
+            <a href="{{ path('app_logout') }}" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Se deconnecter</a>
+        </div>
+    </aside>
+
+    <main class="client-page simple-client-page">
+        <section class="client-content full-width-content">
+            <div class="welcome-banner simple-banner">
+                <div class="welcome-user">
+                    <img class="account-avatar-image welcome-avatar-image" src="{{ asset(photoUrl) }}" alt="Photo de profil de {{ username }}">
+
+                    <div class="welcome-copy">
+                        <p class="welcome-label">Bienvenue</p>
+                        <h1>{{ username }}</h1>
+                        <p>Utilisez la barre de recherche ou les boutons ci-dessus pour naviguer rapidement.</p>
+                    </div>
+                </div>
+            </div>
+
+            <section class="content-card" id="produits">
+                <div class="section-head">
+                    <h2>Produits</h2>
+                    <p>{{ produits|length }} resultat(s)</p>
+                </div>
+
+                <div class="products-grid" id="productsGrid">
+                    {% if produits is not empty %}
+                        {% for prod in produits %}
+                            <article class="product-card searchable-product">
+                                <span class="product-badge">{{ prod.categorie|default('Sans categorie') }}</span>
+                                <div class="product-image">
+                                    <img src="{{ asset(prod.resolved_image) }}" alt="{{ prod.nom_produit|default('Produit') }}">
+                                </div>
+
+                                <h3>{{ prod.nom_produit|default('Produit') }}</h3>
+                                <p><strong>Prix :</strong> {{ prod.prix|default('0') }} DT</p>
+                                <p><strong>Stock :</strong> {{ prod.quantite|default(0) < 0 ? 0 : prod.quantite|default(0) }}</p>
+
+                                <div class="product-actions">
+                                    <a class="small-btn" href="#">Voir produit</a>
+                                    <form action="{{ path('panier_add') }}" method="post" class="add-to-cart-form">
+                                        <input type="hidden" name="id_produit" value="{{ prod.id_produit|default(0) }}">
+                                        <input type="hidden" name="redirect_to" value="{{ path('app_client_interface') }}">
+                                        <button class="primary-btn product-cart-btn" type="submit" {{ prod.quantite|default(0) <= 0 ? 'disabled' : '' }}>
+                                            {{ prod.quantite|default(0) <= 0 ? 'Indisponible' : 'Ajouter au panier' }}
+                                        </button>
+                                    </form>
+                                </div>
+                            </article>
+                        {% endfor %}
+                    {% else %}
+                        <p class="empty-products">Aucun produit trouve dans la base de donnees.</p>
+                    {% endif %}
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <a href="{{ path('panier_index') }}" class="floating-cart-btn" aria-label="Voir le panier">
+        <i class="fa-solid fa-bag-shopping"></i>
+    </a>
+
+    {% include 'partials/_client_script.html.twig' %}
+    {% include 'partials/_footer.html.twig' %}
+{% endblock %}

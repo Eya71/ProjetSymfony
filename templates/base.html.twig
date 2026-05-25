@@ -1,26 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Welcome!{% endblock %}</title>
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     {% block stylesheets %}
-        <link rel="stylesheet" href="{{ asset('css/style.css') }}">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=sidebar-fix-3">
     {% endblock %}
-
-    {% block javascripts %}
-        {% block importmap %}{{ importmap('app') }}{% endblock %}
-    {% endblock %}
-
-    {% set frankenphpHotReload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
-    {% if frankenphpHotReload %}
-        <meta name="frankenphp-hot-reload:url" content="{{ frankenphpHotReload }}">
-        <script src="https://cdn.jsdelivr.net/npm/idiomorph"></script>
-        <script src="https://cdn.jsdelivr.net/npm/frankenphp-hot-reload/+esm" type="module"></script>
-    {% endif %}
+    <style>
+        .overlay {
+            pointer-events: none !important;
+        }
+        body:not(.sidebar-open) .overlay {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
+        }
+        body.sidebar-open .overlay {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+        body.sidebar-open .side-menu {
+            left: 0 !important;
+            z-index: 2001 !important;
+        }
+    </style>
+    {% block javascripts %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
 {% block body %}{% endblock %}
 </body>
 </html>

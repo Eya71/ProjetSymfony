@@ -1,0 +1,181 @@
+<script>
+    const menuBtn = document.getElementById('menuBtn');
+    const sideMenu = document.getElementById('sideMenu');
+    const closeMenu = document.getElementById('closeMenu');
+    const overlay = document.getElementById('overlay');
+    const sidebarPanierTrigger = document.getElementById('sidebarPanierTrigger');
+    const floatingSidebarPanierTrigger = document.getElementById('floatingSidebarPanierTrigger');
+    const demandeTrigger = document.getElementById('demandeTrigger');
+    const notificationTrigger = document.getElementById('notificationTrigger');
+    const sidebarCartButtons = document.querySelectorAll('.open-index-sidebar');
+    const homeSearchInput = document.getElementById('homeProductSearch');
+    const homeProductCards = document.querySelectorAll('.searchable-product');
+    const cartToast = document.getElementById('cartToast');
+    const addToCartForms = document.querySelectorAll('.add-to-cart-form');
+
+    let overlayCloseTimer;
+
+    function forceOverlayHidden() {
+        if (!overlay) return;
+        overlay.classList.remove('active');
+        overlay.style.removeProperty('display');
+        overlay.style.removeProperty('opacity');
+        overlay.style.removeProperty('visibility');
+        overlay.style.removeProperty('pointer-events');
+    }
+
+    function openMenu() {
+        if (!sideMenu || !overlay) return;
+        window.clearTimeout(overlayCloseTimer);
+        document.body.classList.add('sidebar-open');
+        sideMenu.classList.add('active');
+        overlay.classList.add('active');
+    }
+
+    function closeAll() {
+        if (!sideMenu || !overlay) return;
+        document.body.classList.remove('sidebar-open');
+        sideMenu.classList.remove('active');
+        overlay.classList.remove('active');
+        overlayCloseTimer = window.setTimeout(function () {
+            if (!document.body.classList.contains('sidebar-open')) {
+                forceOverlayHidden();
+            }
+        }, 220);
+    }
+
+    window.importySidebarClose = closeAll;
+    window.importySidebarOpen = openMenu;
+    closeAll();
+
+    if (menuBtn) {
+        menuBtn.addEventListener('click', function (event) {
+            event.preventDefault();
+            openMenu();
+        });
+    }
+
+    if (closeMenu) {
+        closeMenu.addEventListener('click', function (event) {
+            event.preventDefault();
+            closeAll();
+        });
+    }
+
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape') {
+            closeAll();
+        }
+    });
+
+    document.addEventListener('click', function (event) {
+        if (overlay && overlay.classList.contains('active') && !sideMenu.classList.contains('active')) {
+            closeAll();
+            return;
+        }
+
+        if (!document.body.classList.contains('sidebar-open')) {
+            return;
+        }
+
+        const clickedInsideSidebar = sideMenu && sideMenu.contains(event.target);
+        const clickedMenuButton = menuBtn && menuBtn.contains(event.target);
+        const clickedCartButton = sidebarPanierTrigger && sidebarPanierTrigger.contains(event.target);
+        const clickedFloatingCart = floatingSidebarPanierTrigger && floatingSidebarPanierTrigger.contains(event.target);
+
+        if (!clickedInsideSidebar && !clickedMenuButton && !clickedCartButton && !clickedFloatingCart) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeAll();
+        }
+    }, true);
+
+    if (sidebarPanierTrigger) {
+        sidebarPanierTrigger.addEventListener('click', function (event) {
+            event.preventDefault();
+            openMenu();
+            showCartToast('Connectez-vous pour continuer.');
+        });
+    }
+
+    if (floatingSidebarPanierTrigger) {
+        floatingSidebarPanierTrigger.addEventListener('click', function (event) {
+            event.preventDefault();
+            openMenu();
+            showCartToast('Connectez-vous pour continuer.');
+        });
+    }
+
+    if (demandeTrigger) {
+        demandeTrigger.addEventListener('click', function (event) {
+            event.preventDefault();
+            showCartToast('Connectez-vous pour continuer.');
+        });
+    }
+
+    if (notificationTrigger) {
+        notificationTrigger.addEventListener('click', function (event) {
+            event.preventDefault();
+            showCartToast('Connectez-vous pour continuer.');
+        });
+    }
+
+    sidebarCartButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            openMenu();
+        });
+    });
+
+    if (homeSearchInput) {
+        homeSearchInput.addEventListener('input', function () {
+            const query = this.value.toLowerCase().trim();
+            homeProductCards.forEach(function (card) {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+    }
+
+    function showCartToast(message) {
+        if (!cartToast) return;
+        cartToast.textContent = message;
+        cartToast.classList.add('visible');
+        window.clearTimeout(showCartToast.timeoutId);
+        showCartToast.timeoutId = window.setTimeout(function () {
+            cartToast.classList.remove('visible');
+        }, 2200);
+    }
+
+    sidebarCartButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            showCartToast('Connectez-vous pour continuer.');
+        });
+    });
+
+    addToCartForms.forEach(function(form) {
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            try {
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    },
+                    body: new FormData(form)
+                });
+
+                const data = await response.json();
+                if (data.redirect && !data.success) {
+                    window.location.href = data.redirect;
+                    return;
+                }
+
+                showCartToast(data.message || 'Produit ajoute dans le panier.');
+            } catch (error) {
+                showCartToast('Erreur lors de l ajout au panier.');
+            }
+        });
+    });
+</script>
