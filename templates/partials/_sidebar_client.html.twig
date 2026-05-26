@@ -9,7 +9,7 @@
     <div class="side-header">
 
         <a class="brand"
-           href="{{ path('app_index') }}">
+           href="{{ path('app_login') }}">
 
             <img class="brand-img"
                  src="{{ asset('files_profil/logo.png') }}"
@@ -37,28 +37,28 @@
 
             </h4>
 
-            <a href="#">
+            <a href="app_client_profile">
 
                 <i class="fa-regular fa-user"></i>
                 Mon compte
 
             </a>
 
-            <a href="#">
+            <a href="{{ path('panier_index') }}">
 
                 <i class="fa-solid fa-bag-shopping"></i>
                 Panier
 
             </a>
 
-            <a href="#">
+            <a href="{{ path('demande_index') }}">
 
                 <i class="fa-solid fa-plus"></i>
                 Demande
 
             </a>
 
-            <a href="#">
+            <a href="{{ path('mes_demandes') }}">
 
                 <i class="fa-solid fa-list-check"></i>
                 Mes demandes
@@ -79,7 +79,7 @@
 
             </a>
 
-            <a href="{{ path('app_index') }}">
+            <a href="{{ path('app_home') }}">
 
                 <i class="fa-solid fa-right-from-bracket"></i>
                 Déconnexion
@@ -98,7 +98,7 @@
 
             </h4>
 
-            <a href="{{ path('app_index') }}">
+            <a href="{{ path('app_login') }}">
 
                 <i class="fa-regular fa-user"></i>
                 Login

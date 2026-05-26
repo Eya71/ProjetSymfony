@@ -1,240 +1,148 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}
-    Mon panier
-{% endblock %}
+{% block title %}Mon panier{% endblock %}
 
 {% block stylesheets %}
-
-    <link rel="stylesheet"
-          href="{{ asset('css/style.css') }}">
-
-    <link rel="stylesheet"
-          href="{{ asset('css/mes_demandes.css') }}">
-
-    <link rel="stylesheet"
-          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=sidebar-fix-3">
+    <link rel="stylesheet" href="{{ asset('css/mes_demandes.css') }}">
 {% endblock %}
 
 {% block body %}
+    <header class="top-header simple-client-header">
+        <div class="header-left">
+            <a href="{{ path('app_client_interface') }}" class="logo">
+                <img src="{{ asset('files_profil/logo.png') }}" alt="Importy" class="logo-img">
+            </a>
+        </div>
 
-    {% include 'partials/_header_client.html.twig' %}
+        <div class="header-center">
+            <h1 class="title">Mon panier</h1>
+        </div>
 
-    {% include 'partials/_sidebar_client.html.twig' %}
+        <div class="icons quick-actions">
+            <a href="#" class="icon-item">
+                <i class="fa-regular fa-user" style="color:#B197FC;"></i>
+                <span>Mon compte</span>
+            </a>
+            <a href="#" class="icon-item">
+                <i class="fa-solid fa-list-check" style="color:#74C0FC;"></i>
+                <span>Mes demandes</span>
+            </a>
+            <a href="#" class="icon-item">
+                <i class="fa-solid fa-plus" style="color:#74C0FC;"></i>
+                <span>Demande</span>
+            </a>
+            <a href="{{ path('app_client_interface') }}" class="icon-item">
+                <i class="fa-solid fa-home" style="color:#74C0FC;"></i>
+                <span>acceuil</span>
+            </a>
+        </div>
+    </header>
 
     <main class="panier-page">
-
         <div class="panier-layout">
-
             <div class="panier-left">
-
                 <section class="content-card panier-card">
-
                     <div class="section-head">
-
                         <div>
-
-                            <h2>
-
-                                Mon panier
-
-                            </h2>
-
-                            <p>
-
-                                {{ items|length }} produit(s)
-
-                            </p>
-
+                            <h2>Mon panier</h2>
+                            <p>{{ items|length }} produit(s)</p>
                         </div>
-
                     </div>
 
-                    {% if items is not empty %}
+                    {% for message in success %}
+                        <div class="account-message success-message">{{ message }}</div>
+                    {% endfor %}
 
-                        <div class="panier-list">
+                    {% for message in errors %}
+                        <div class="account-message error-message">{{ message }}</div>
+                    {% endfor %}
 
-                            {% for item in items %}
-
-                                <article class="panier-item">
-
-                                    <div class="panier-image">
-
-                                        <img src="{{ asset(item.image_path) }}"
-                                             alt="">
-
-                                    </div>
-
-                                    <div class="panier-content">
-
-                                        <span class="product-badge">
-
-                                            {{ item.categorie }}
-
-                                        </span>
-
-                                        <h3>
-
-                                            {{ item.nom_produit }}
-
-                                        </h3>
-
-                                        <p>
-
-                                            {{ item.description }}
-
-                                        </p>
-
-                                        <strong class="price">
-
-                                            {{ item.prix }} DT
-
-                                        </strong>
-
-                                        <p>
-
-                                            <strong>
-
-                                                Sous-total :
-
-                                            </strong>
-
-                                            {{ item.prix * item.quantite }} DT
-
-                                        </p>
-
-                                        <div class="panier-controls">
-
-                                            <form action="{{ path('panier_update', {'id': item.id}) }}"
-                                                  method="post">
-
-                                                <input type="number"
-                                                       name="quantite"
-                                                       value="{{ item.quantite }}"
-                                                       min="1">
-
-                                                <button class="secondary-btn">
-
-                                                    Modifier
-
-                                                </button>
-
-                                            </form>
-
-                                            <form action="{{ path('panier_delete', {'id': item.id}) }}"
-                                                  method="post">
-
-                                                <button class="delete-btn">
-
-                                                    Supprimer
-
-                                                </button>
-
-                                            </form>
-
-                                        </div>
-
-                                    </div>
-
-                                </article>
-
-                            {% endfor %}
-
-                        </div>
-
-                    {% else %}
-
-                        <p>
-
-                            Votre panier est vide.
-
-                        </p>
-
-                    {% endif %}
-
+                    {% include 'panier/_items.html.twig' %}
                 </section>
-
             </div>
 
             <div class="panier-right">
-
                 <div class="resume-card">
-
-                    <h3>
-
-                        Récapitulatif
-
-                    </h3>
+                    <h3>Récapitulatif</h3>
 
                     <div class="resume-line">
-
-                        <span>
-
-                            Sous-total
-
-                        </span>
-
-                        <span>
-
-                            {{ total }} DT
-
-                        </span>
-
+                        <span>Sous-total</span>
+                        <span>{{ total|number_format(2, '.', ' ') }} DT</span>
                     </div>
 
                     <div class="resume-line">
-
-                        <span>
-
-                            Livraison
-
-                        </span>
-
-                        <span>
-
-                            Calculé plus tard
-
-                        </span>
-
+                        <span>Livraison</span>
+                        <span>Calculé à l'étape paiement</span>
                     </div>
 
                     <div class="resume-line total">
-
-                        <span>
-
-                            Total
-
-                        </span>
-
-                        <span>
-
-                            {{ total }} DT
-
-                        </span>
-
+                        <span>Total</span>
+                        <span>{{ total|number_format(2, '.', ' ') }} DT</span>
                     </div>
 
-                    <form action="#"
-                          method="post">
-
-                        <button type="submit"
-                                class="btn-checkout">
-
+                    <form action="{{ path('panier_validate') }}" method="post">
+                        <button type="submit" class="btn-checkout">
                             Valider mon panier
-
                         </button>
-
                     </form>
-
                 </div>
 
+                <a href="#" class="orders-shortcut-card">
+                    <div class="orders-shortcut-top">
+                        <span class="orders-shortcut-icon"><i class="fa-solid fa-box-open"></i></span>
+                        <span class="orders-shortcut-badge">{{ ordersCount }}</span>
+                    </div>
+                    <h3>Mes commandes</h3>
+                    <p>Retrouver toutes les commandes validées depuis votre panier et suivre leur statut.</p>
+                    <span class="orders-shortcut-link">Voir mes commandes <i class="fa-solid fa-arrow-right"></i></span>
+                </a>
             </div>
-
         </div>
-
     </main>
 
-    {% include 'partials/_footer.html.twig' %}
+    <div class="about-site">
+        <h4><strong>A propos de nous</strong></h4>
+        <p>
+            Importy est un site de vente en ligne qui permet de découvrir et d’acheter
+            facilement différents produits dans plusieurs catégories
 
+            Importy vise à offrir une expérience d’achat fluide et sécurisée, avec un large choix de produits
+            pour répondre aux attentes de tous les clients.
+        </p>
+    </div>
+
+    <div class="services">
+        <div class="service">
+            <div class="icon"><i class="fa-solid fa-store"></i></div>
+            <div>
+                <h4>pour les vendeurs</h4>
+                <p>Proposez vos produits et gérez votre activité en toute simplicité.</p>
+            </div>
+        </div>
+
+        <div class="service">
+            <div class="icon"><i class="fa-solid fa-truck"></i></div>
+            <div>
+                <h4>Livraison standard offerte</h4>
+                <p>just verifier votre adresse dans le compte</p>
+            </div>
+        </div>
+
+        <div class="service">
+            <div class="icon"><i class="fa-regular fa-credit-card"></i></div>
+            <div>
+                <h4>Paiements a la livraison</h4>
+                <p>vous payez le livreur lorsque vous recevez votre commande</p>
+            </div>
+        </div>
+
+        <div class="service">
+            <div class="icon"><i class="fa-solid fa-undo"></i></div>
+            <div>
+                <h4>Retours</h4>
+                <p>sous 14 jours</p>
+            </div>
+        </div>
+    </div>
 {% endblock %}

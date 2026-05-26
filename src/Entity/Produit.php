@@ -11,14 +11,15 @@ class Produit
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(name: 'id_produit')]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'produits')]
-    private ?Vendeur $vendeur_username = null;
+    #[ORM\JoinColumn(name: 'vendeur_username', referencedColumnName: 'username')]
+    private ?Vendeur $vendeurUsername = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $nom_produit = null;
+    #[ORM\Column(name: 'nom_produit', length: 255)]
+    private ?string $nomProduit = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $prix = null;
@@ -29,11 +30,14 @@ class Produit
     #[ORM\Column(length: 255)]
     private ?string $categorie = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $decription = null;
+    #[ORM\Column(name: 'description', length: 255)]
+    private ?string $description = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $image_path = null;
+    #[ORM\Column(name: 'image_path', length: 255)]
+    private ?string $imagePath = null;
+
+    #[ORM\Column(name: 'created_at', nullable: true)]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
     {
@@ -42,24 +46,24 @@ class Produit
 
     public function getVendeurUsername(): ?Vendeur
     {
-        return $this->vendeur_username;
+        return $this->vendeurUsername;
     }
 
-    public function setVendeurUsername(?Vendeur $vendeur_username): static
+    public function setVendeurUsername(?Vendeur $vendeurUsername): static
     {
-        $this->vendeur_username = $vendeur_username;
+        $this->vendeurUsername = $vendeurUsername;
 
         return $this;
     }
 
     public function getNomProduit(): ?string
     {
-        return $this->nom_produit;
+        return $this->nomProduit;
     }
 
-    public function setNomProduit(string $nom_produit): static
+    public function setNomProduit(string $nomProduit): static
     {
-        $this->nom_produit = $nom_produit;
+        $this->nomProduit = $nomProduit;
 
         return $this;
     }
@@ -100,26 +104,38 @@ class Produit
         return $this;
     }
 
-    public function getDecription(): ?string
+    public function getDescription(): ?string
     {
-        return $this->decription;
+        return $this->description;
     }
 
-    public function setDecription(string $decription): static
+    public function setDescription(string $description): static
     {
-        $this->decription = $decription;
+        $this->description = $description;
 
         return $this;
     }
 
     public function getImagePath(): ?string
     {
-        return $this->image_path;
+        return $this->imagePath;
     }
 
-    public function setImagePath(string $image_path): static
+    public function setImagePath(string $imagePath): static
     {
-        $this->image_path = $image_path;
+        $this->imagePath = $imagePath;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

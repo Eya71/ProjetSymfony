@@ -1,23 +1,31 @@
+const menuBtn = document.getElementById("menuBtn");
+const sideMenu = document.getElementById("sideMenu");
+const closeMenu = document.getElementById("closeMenu");
+const overlay = document.getElementById("overlay");
 
-    const menuBtn = document.getElementById('menuBtn');
-    const closeMenuBtn = document.getElementById('closeMenu');
-    const sideMenu = document.getElementById('sideMenu');
-    const overlay = document.getElementById('overlay');
-
-    /* OUVRIR */
-    menuBtn.addEventListener('click', () => {
-    sideMenu.classList.add('active');
-    overlay.style.display = 'block';
+menuBtn.addEventListener("click", () => {
+  sideMenu.classList.add("active");
+  overlay.style.display = "block";
 });
 
-    /* FERMER */
-    closeMenuBtn.addEventListener('click', () => {
-    sideMenu.classList.remove('active');
-    overlay.style.display = 'none';
-});
+closeMenu.addEventListener("click", closeAll);
+overlay.addEventListener("click", closeAll);
 
-    /* CLIQUER DEHORS */
-    overlay.addEventListener('click', () => {
-    sideMenu.classList.remove('active');
-    overlay.style.display = 'none';
+function closeAll() {
+  sideMenu.classList.remove("active");
+  overlay.style.display = "none";
+}
+const iconItems = document.querySelectorAll(".icon-item");
+
+iconItems.forEach(item => {
+  item.addEventListener("click", function(e) {
+
+    
+    if (!item.classList.contains("login-btn")) {
+      e.preventDefault();
+      sideMenu.classList.add("active");
+      overlay.style.display = "block";
+    }
+
+  });
 });

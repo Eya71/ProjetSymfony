@@ -5,17 +5,14 @@ namespace App\Entity;
 use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 class Client
 {
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
-    #[ORM\Column(length: 50, unique: true)]
+    #[ORM\Column(name: 'username', length: 30)]
     private ?string $username = null;
 
     #[ORM\Column(length: 100)]
@@ -24,14 +21,17 @@ class Client
     #[ORM\Column(length: 100)]
     private ?string $adresse = null;
 
-    #[ORM\Column(length: 20)]
+    #[ORM\Column(name: 'num_tel', length: 20)]
     private ?string $numTel = null;
 
-    #[ORM\Column(length: 200)]
+    #[ORM\Column(name: 'idphoto', length: 255, nullable: true)]
     private ?string $idPhoto = null;
 
-    #[ORM\Column(length: 100)]
-    private ?string $pwd = null;
+    #[ORM\Column(name: 'password', length: 255, nullable: true)]
+    private ?string $password = null;
+
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $createdAt = null;
 
     /**
      * @var Collection<int, Demande>
@@ -42,18 +42,13 @@ class Client
     /**
      * @var Collection<int, Review>
      */
-    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'client_username')]
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'clientUsername')]
     private Collection $reviews;
 
     public function __construct()
     {
         $this->demandes = new ArrayCollection();
         $this->reviews = new ArrayCollection();
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
     }
 
     public function getUsername(): ?string
@@ -109,21 +104,33 @@ class Client
         return $this->idPhoto;
     }
 
-    public function setIdPhoto(string $idPhoto): static
+    public function setIdPhoto(?string $idPhoto): static
     {
         $this->idPhoto = $idPhoto;
 
         return $this;
     }
 
-    public function getPwd(): ?string
+    public function getPassword(): ?string
     {
-        return $this->pwd;
+        return $this->password;
     }
 
-    public function setPwd(string $pwd): static
+    public function setPassword(?string $password): static
     {
-        $this->pwd = $pwd;
+        $this->password = $password;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }
@@ -149,7 +156,6 @@ class Client
     public function removeDemande(Demande $demande): static
     {
         if ($this->demandes->removeElement($demande)) {
-            // set the owning side to null (unless already changed)
             if ($demande->getUsername() === $this) {
                 $demande->setUsername(null);
             }
@@ -179,7 +185,6 @@ class Client
     public function removeReview(Review $review): static
     {
         if ($this->reviews->removeElement($review)) {
-            // set the owning side to null (unless already changed)
             if ($review->getClientUsername() === $this) {
                 $review->setClientUsername(null);
             }

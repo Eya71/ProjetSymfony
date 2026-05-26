@@ -19,10 +19,10 @@ class DealRequest
     #[ORM\ManyToOne(inversedBy: 'dealRequests')]
     private ?Demande $id_demande = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     private ?Client $client_username = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[ORM\ManyToOne(cascade: ['persist', 'remove'])]
     private ?Vendeur $vendeur_username = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
@@ -48,6 +48,9 @@ class DealRequest
 
     #[ORM\OneToOne(mappedBy: 'id_deal', cascade: ['persist', 'remove'])]
     private ?Review $review = null;
+
+    #[ORM\Column(length: 20)]
+    private ?string $status = null;
 
     public function __construct()
     {
@@ -203,6 +206,18 @@ class DealRequest
         }
 
         $this->review = $review;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(string $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }
