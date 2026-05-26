@@ -1,30 +1,21 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Espace Vendeur - {{ vendeur.username }}{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/vendeur_style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/page_vendeur.css') }}">
-{% endblock %}
 
 {% block body %}
-
-
-
-
+{% include %}
 <main class="client-page simple-client-page vendeur-main">
     <section class="client-content full-width-content">
         <div class="welcome-banner simple-banner">
             <div class="welcome-user">
                 {% if vendeur.idPhoto %}
-                <img
-                        class="account-avatar-image welcome-avatar-image"
-                        src="<?= htmlspecialchars($photoUrl) ?>"
-                        alt="Photo de profil de {{ vendeur.username }}"
-                >
+                    <img
+                            class="account-avatar-image welcome-avatar-image"
+                            src="<?= htmlspecialchars($photoUrl) ?>"
+                            alt="Photo de profil de {{ vendeur.username }}"
+                    >
                 {% else %}
-                <div class="avatar-circle welcome-avatar">{{ vendeur.username|first|upper }}</div>
+                    <div class="avatar-circle welcome-avatar">{{ vendeur.username|first|upper }}</div>
                 {% endif %}
                 <div class="welcome-copy">
                     <p class="welcome-label">Bienvenue</p>
@@ -69,91 +60,64 @@
             {% if produits is not empty %}
             <div class="cards">
                 {% for p in myProduits %}
-                <article class="inner-card">
+                    <article class="inner-card">
 
-                    {% set prodImage = resolveImagePath(p.image_path ?? '') %}
-                    {% if prodImage != '' %}
-                    <img class="prod-img" src="{{ prodImage|e }}" alt="Produit">
+                        {% set prodImage = resolveImagePath(p.image_path ?? '') %}
+                        {% if prodImage != '' %}
+                            <img class="prod-img" src="{{ prodImage|e }}" alt="Produit">
                         {% else %}
                             <img class="prod-img" src="asset{{ file_profil/logo.png }}" alt="Produit">
-                    {% endif %}
-                    <h3>{{ p.nom_produit|e }}</h3>
-                    <p class="meta">{{ p.categorie|e }} | {{ p.prix|e }} TND | {{ p.created_at|e }}</p>
-                    <p><strong>Stock :</strong> {{ p.quantite > 0 ? (p.quantite ~ ' disponible(s)') : 'Rupture de stock' }}</p>
-                    <p>{{ p.description|e }}</p
-                    <div class="product-actions">
-                        <a href="/edit_product.php?id=<?= (int)$p['id_produit'] ?>" class="secondary-btn">Modifier</a>
-                        <form action="/php/delete_product.php" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer ce produit ?');">
-                            <input type="hidden" name="id_produit" value="<?= (int)$p['id_produit'] ?>">
-                            <button type="submit" class="small-btn" style="background:#ffe4e6;color:#b91c1c;">Supprimer</button>
-                        </form>
-                    </div>
-                </article>
-                <?php endforeach; ?>
+                        {% endif %}
+                        <h3>{{ p.nom_produit|e }}</h3>
+                        <p class="meta">{{ p.categorie|e }} | {{ p.prix|e }} TND | {{ p.created_at|e }}</p>
+                        <p><strong>Stock :</strong> {{ p.quantite > 0 ? (p.quantite ~ ' disponible(s)') : 'Rupture de stock' }}</p>
+                        <p>{{ p.description|e }}</p>
+                        <div class="product-actions">
+                            <a href="{{ path('vendeur_edit_product', {id: produit.id}) }}" class="secondary-btn">Modifier</a>
+                            <form action="{{ path('vendeur_delete_product', {id: produit.id}) }}" method="POST" onsubmit="return confirm('Voulez-vous vraiment supprimer ce produit ?');">
+                                <button type="submit" class="small-btn btn-danger">Supprimer</button>
+                            </form>
+                        </div>
+                    </article>
+                {% endfor %}
             </div>
-            <?php if (empty($myProduits)): ?><p>Aucun produit poste pour le moment.</p><?php endif; ?>
+            {% if myProduits is empty %}
+                <p>Aucun produit poste pour le moment.</p>
+            {% endif %}
         </section>
-
+        <!-- Demandes clients -->
         <section class="content-card">
             <div class="section-head">
                 <h2>Demandes clients</h2>
                 <p>Vous pouvez proposer un deal</p>
             </div>
+            {% if demandes is not empty %}
             <div class="cards">
-                <?php foreach ($demandes as $d): ?>
-                <article class="inner-card">
-                    <?php if (!empty($d['id_photo'])): ?>
-                    <img class="dem-img" src="<?= htmlspecialchars(resolveDemandeImagePath($d['id_photo'])) ?>" alt="Demande">
-                    <?php endif; ?>
-                    <h3><?= htmlspecialchars($d['nom_produit']) ?></h3>
-                    <p class="meta">Client: <?= htmlspecialchars($d['username']) ?> | Budget: <?= htmlspecialchars($d['prix']) ?> TND | Date: <?= htmlspecialchars($d['created_at'] ?? '') ?></p>
-                    <p><?= htmlspecialchars($d['description']) ?></p>
-                    <form action="/php/send_offer.php" method="post">
-                        <input type="hidden" name="id_demande" value="<?= (int)$d['id_demande'] ?>">
-                        <input type="number" name="prix_propose" min="1" step="0.01" placeholder="Votre prix propose" required>
-                        <textarea name="message" rows="2" placeholder="Votre message..." required></textarea>
-                        <button type="submit">Envoyer une offre</button>
-                    </form>
-                </article>
-                <?php endforeach; ?>
+                {% for demande in demandes %}
+                    <article class="inner-card">
+                        {% if demande.idPhoto %}
+                            <img class="dem-img" src="{{ demande.idPhoto }}" alt="Demande">
+                        {% endif %}
+                        <h3>{{ demande.nomProduit }}</h3>
+                        <p class="meta">
+                            Client: {{ demande.username }} | Budget: {{ demande.prix }} TND |
+                            Date: {{ demande.createdAt|date('d/m/Y') }}
+                        </p>
+                        <p>{{ demande.description }}</p>
+                        <form method="POST" action="{{ path('vendeur_send_offer') }}" class="offer-form">
+                            <input type="hidden" name="id_demande" value="{{ demande.id }}">
+                            <input type="number" name="prix_propose" min="1" step="0.01" placeholder="Votre prix proposé" required>
+                            <textarea name="message" rows="2" placeholder="Votre message..." required></textarea>
+                            <button type="submit" class="btn btn-primary">Envoyer une offre</button>
+                        </form>
+                    </article>
+                {% endfor %}
             </div>
         </section>
     </section>
 </main>
 
-<script>
-    const menuBtn = document.getElementById('menuBtn');
-    const sideMenu = document.getElementById('sideMenu');
-    const closeMenu = document.getElementById('closeMenu');
-    const overlay = document.getElementById('overlay');
-    const logoutLink = document.getElementById('logoutLink');
-
-    function openMenu() {
-        sideMenu.classList.add('active');
-        sideMenu.setAttribute('aria-hidden', 'false');
-        overlay.style.display = 'block';
-    }
-
-    function closeAll() {
-        sideMenu.classList.remove('active');
-        sideMenu.setAttribute('aria-hidden', 'true');
-        overlay.style.display = 'none';
-    }
-
-    if (menuBtn && closeMenu && overlay) {
-        menuBtn.addEventListener('click', openMenu);
-        closeMenu.addEventListener('click', closeAll);
-        overlay.addEventListener('click', closeAll);
-    }
-
-    if (logoutLink) {
-        logoutLink.addEventListener('click', function(event) {
-            if (!window.confirm('Est tu sure que tu veux te deconnecter ?')) {
-                event.preventDefault();
-            }
-        });
-    }
-</script>
+<script src="{{ asset('js/vendeur.js') }}" defer> </script>
 </body>
 
 </html>

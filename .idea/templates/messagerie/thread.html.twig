@@ -1,0 +1,35 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}IMPORTY : Conversation avec {{ otherUsername }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/messages.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% include 'partials/_header_client.html.twig' with {'notifCount': notifCount, 'messageCount': messageCount, 'photoUrl': photoUrl} %}
+
+    <main class="thread-page">
+        <div class="thread-container" id="threadContainer" data-deal-id="{{ deal.id_deal }}" data-current-user="{{ username }}">
+            <header class="thread-header">
+                <a href="{{ path('app_messagerie_index') }}" class="thread-back"><i class="fa-solid fa-arrow-left"></i></a>
+                <img src="{{ asset(otherPhoto) }}" alt="" class="thread-avatar">
+                <div class="thread-info">
+                    <strong>{{ otherUsername }}</strong>
+                    <span>{{ deal.nom_produit }} — {{ deal.prix_propose }} DT — {{ deal.status }}</span>
+                </div>
+            </header>
+
+            <ul id="messages-list" class="messages-list"></ul>
+
+            <form id="send-form" class="send-form" autocomplete="off">
+                <input type="text" id="message-input" name="contenu" placeholder="Écrire un message..." required>
+                <button type="submit" class="primary-btn"><i class="fa-solid fa-paper-plane"></i></button>
+            </form>
+        </div>
+    </main>
+
+    <script src="{{ asset('js/messagerie.js') }}" defer></script>
+    <script src="{{ asset('js/notifications.js') }}" defer></script>
+{% endblock %}

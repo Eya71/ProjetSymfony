@@ -1,0 +1,45 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}IMPORTY : Messages{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/messages.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% include 'partials/_header_client.html.twig' with {'notifCount': notifCount, 'messageCount': messageCount, 'photoUrl': photoUrl} %}
+
+    <main class="messagerie-page">
+        <div class="messagerie-container">
+            <h1 class="messagerie-title">Mes conversations</h1>
+
+            {% if threads is empty %}
+                <p class="messagerie-empty">Aucune conversation pour le moment.</p>
+            {% else %}
+                <ul class="thread-list">
+                    {% for t in threads %}
+                        <li class="thread-row {{ t.unread > 0 ? 'has-unread' : '' }}">
+                            <a href="{{ path('app_messagerie_thread', {'idDeal': t.id_deal}) }}" class="thread-link">
+                                <img src="{{ asset(t.photo_url) }}" alt="" class="thread-thumb">
+                                <div class="thread-meta">
+                                    <div class="thread-head">
+                                        <strong>{{ role == 'client' ? t.vendeur_username : t.client_username }}</strong>
+                                        <span class="thread-status">{{ t.status }}</span>
+                                    </div>
+                                    <div class="thread-sub">{{ t.nom_produit }} — {{ t.prix_propose }} DT</div>
+                                    <div class="thread-last">{{ t.last_msg|default('Pas encore de message')|slice(0, 90) }}</div>
+                                </div>
+                                {% if t.unread > 0 %}
+                                    <span class="thread-badge">{{ t.unread }}</span>
+                                {% endif %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </main>
+
+    <script src="{{ asset('js/notifications.js') }}" defer></script>
+{% endblock %}
