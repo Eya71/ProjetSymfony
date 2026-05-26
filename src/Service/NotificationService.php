@@ -2,12 +2,18 @@
 
 namespace App\Service;
 
+use App\Entity\Notification;
+use App\Repository\NotificationRepository;
 use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
 
 final class NotificationService
 {
-    public function __construct(private readonly Connection $connection)
-    {
+    public function __construct(
+        private readonly EntityManagerInterface $em,
+        private readonly NotificationRepository $notifications,
+        private readonly Connection $connection,
+    ) {
     }
 
     public function create(
@@ -20,18 +26,20 @@ final class NotificationService
         ?string $actorUsername = null,
         ?int $relatedId = null
     ): void {
-        $this->connection->insert('notification', [
-            'recipient_username' => $recipientUsername,
-            'recipient_role' => $recipientRole,
-            'type' => $type,
-            'title' => $title,
-            'body' => $body,
-            'link' => $link,
-            'actor_username' => $actorUsername,
-            'related_id' => $relatedId,
-            'is_read' => 0,
-            'created_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
-        ]);
+        $notification = (new Notification())
+            ->setRecipientUsername($recipientUsername)
+            ->setRecipientRole($recipientRole)
+            ->setType($type)
+            ->setTitle($title)
+            ->setBody($body)
+            ->setLink($link)
+            ->setActorUsername($actorUsername)
+            ->setRelatedId($relatedId)
+            ->setIsRead(false)
+            ->setCreatedAt(new \DateTimeImmutable());
+
+        $this->em->persist($notification);
+        $this->em->flush();
     }
 
     public function notifyNewMessage(string $senderUsername, string $receiverUsername, string $receiverRole, int $idDeal, string $contenu): void
@@ -107,37 +115,33 @@ final class NotificationService
 
     public function unreadCount(string $username, string $role): int
     {
-        return (int) $this->connection->fetchOne(
-            'SELECT COUNT(*) FROM notification WHERE recipient_username = :u AND recipient_role = :r AND is_read = 0',
-            ['u' => $username, 'r' => $role]
-        );
+        return $this->notifications->countUnreadForRecipient($username, $role);
     }
 
     public function recent(string $username, string $role, int $limit = 20): array
     {
-        return $this->connection->fetchAllAssociative(
-            'SELECT id_notif, type, title, body, link, actor_username, related_id, is_read, created_at
-             FROM notification
-             WHERE recipient_username = :u AND recipient_role = :r
-             ORDER BY id_notif DESC
-             LIMIT '.$limit,
-            ['u' => $username, 'r' => $role]
-        );
+        $entities = $this->notifications->findFeedForRecipient($username, $role, $limit);
+
+        return array_map(static fn(Notification $n): array => [
+            'id_notif' => $n->getId(),
+            'type' => $n->getType(),
+            'title' => $n->getTitle(),
+            'body' => $n->getBody(),
+            'link' => $n->getLink(),
+            'actor_username' => $n->getActorUsername(),
+            'related_id' => $n->getRelatedId(),
+            'is_read' => $n->isRead() ? 1 : 0,
+            'created_at' => $n->getCreatedAt()?->format('Y-m-d H:i:s'),
+        ], $entities);
     }
 
     public function markRead(int $id, string $username, string $role): void
     {
-        $this->connection->executeStatement(
-            'UPDATE notification SET is_read = 1 WHERE id_notif = :id AND recipient_username = :u AND recipient_role = :r',
-            ['id' => $id, 'u' => $username, 'r' => $role]
-        );
+        $this->notifications->markOneReadFor($id, $username, $role);
     }
 
     public function markAllRead(string $username, string $role): void
     {
-        $this->connection->executeStatement(
-            'UPDATE notification SET is_read = 1 WHERE recipient_username = :u AND recipient_role = :r AND is_read = 0',
-            ['u' => $username, 'r' => $role]
-        );
+        $this->notifications->markAllReadFor($username, $role);
     }
 }
