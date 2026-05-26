@@ -1,0 +1,135 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes commandes{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/commande_vendeur.css') }}">
+{% endblock %}
+
+
+{% block body %}
+
+
+    <main class="vendor-shell">
+
+        <section class="vendor-hero-card">
+            <div>
+                <div class="vendor-kicker">Gestion vendeur</div>
+
+                <h2>Mes commandes</h2>
+
+                <p class="vendor-hero-text">
+                    Suivez vos commandes, filtrez selon leur origine et modifiez leur statut.
+                </p>
+            </div>
+
+            <div class="vendor-pill">
+                {{ commandes|length }} commande(s)
+            </div>
+        </section>
+
+        <section class="vendor-filter-row">
+            <a href="{{ path('app_vendeur_commandes', { type: 'all' }) }}"
+               class="vendor-filter-chip {{ type == 'all' ? 'active' : '' }}">
+                Toutes
+            </a>
+
+            <a href="{{ path('app_vendeur_commandes', { type: 'panier' }) }}"
+               class="vendor-filter-chip {{ type == 'panier' ? 'active' : '' }}">
+                Depuis panier
+            </a>
+
+            <a href="{{ path('app_vendeur_commandes', { type: 'demande' }) }}"
+               class="vendor-filter-chip {{ type == 'demande' ? 'active' : '' }}">
+                Après demande
+            </a>
+        </section>
+
+        {% if commandes is empty %}
+
+            <div class="vendor-empty-box">
+                <h3>Aucune commande trouvée</h3>
+                <p>Vous n’avez aucune commande pour le moment.</p>
+            </div>
+
+        {% else %}
+
+            <section class="vendor-list">
+
+                {% for commande in commandes %}
+
+                    <article class="vendor-record-card">
+
+                        <div class="vendor-record-content">
+
+                            <div class="vendor-record-head">
+                                <div>
+                                    <h3>
+                                        {% if commande.source == 'panier' %}
+                                            Commande panier
+                                        {% else %}
+                                            Commande après demande
+                                        {% endif %}
+                                    </h3>
+
+                                    <div class="vendor-meta-row">
+                                    <span class="vendor-chip">
+                                        <i class="fa-regular fa-user"></i>
+                                        {{ commande.client.username }}
+                                    </span>
+
+                                        <span class="vendor-chip strong">
+                                        {{ commande.source }}
+                                    </span>
+                                    </div>
+                                </div>
+
+                                <span class="vendor-status-chip {{ commande.statut }}">
+                                {{ commande.statut }}
+                            </span>
+                            </div>
+
+                            <p>
+                                <strong>Total :</strong>
+                                {{ commande.total }} DT
+                            </p>
+
+                            <form method="post"
+                                  action="{{ path('app_vendeur_commande_statut', { id: commande.id }) }}"
+                                  class="vendor-status-form">
+
+                                <input type="hidden" name="type" value="{{ type }}">
+
+                                <label>Changer le statut :</label>
+
+                                <select name="statut">
+                                    <option value="termine" {{ commande.statut == 'termine' ? 'selected' : '' }}>
+                                        Terminé
+                                    </option>
+
+                                    <option value="annule" {{ commande.statut == 'annule' ? 'selected' : '' }}>
+                                        Annulé
+                                    </option>
+                                </select>
+
+                                <button type="submit" class="btn-link">
+                                    Modifier
+                                </button>
+                            </form>
+
+                        </div>
+
+                    </article>
+
+                {% endfor %}
+
+            </section>
+
+        {% endif %}
+
+    </main>
+
+{% endblock %}
+
+{% block javascripts %}<script src="{{ asset('js/menu.js') }}"></script>{% endblock %}

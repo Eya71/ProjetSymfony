@@ -38,36 +38,59 @@ final class LegacyLoginAuthenticator extends AbstractLoginFormAuthenticator
         $request->getSession()->set('last_login_role', $role);
 
         return new Passport(
-            new UserBadge($role.'|'.$username, fn (string $identifier): LegacyUser => $this->userProvider->loadUserByIdentifier($identifier)),
+            new UserBadge(
+                $role . '|' . $username,
+                fn (string $identifier): LegacyUser => $this->userProvider->loadUserByIdentifier($identifier)
+            ),
             new CustomCredentials(function (string $plainPassword, LegacyUser $user): bool {
                 $storedPassword = (string) $user->getPassword();
+
                 if ($storedPassword === '') {
                     return false;
                 }
 
                 $passwordInfo = password_get_info($storedPassword);
+
                 if (($passwordInfo['algo'] ?? null) !== 0 && ($passwordInfo['algo'] ?? null) !== null) {
                     return $this->passwordHasher->isPasswordValid($user, $plainPassword);
                 }
 
                 return hash_equals($storedPassword, $plainPassword);
             }, $password),
-            [new RememberMeBadge()]
+            [
+                new RememberMeBadge(),
+            ]
         );
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
-    {
+    public function onAuthenticationSuccess(
+        Request $request,
+        TokenInterface $token,
+        string $firewallName
+    ): ?Response {
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
 
         $user = $token->getUser();
-        if ($user instanceof LegacyUser && $user->getLegacyRole() === 'client') {
-            return new RedirectResponse($this->urlGenerator->generate('app_client_interface'));
+
+        if ($user instanceof LegacyUser) {
+            if ($user->getLegacyRole() === 'client') {
+                return new RedirectResponse(
+                    $this->urlGenerator->generate('app_client_interface')
+                );
+            }
+
+            if ($user->getLegacyRole() === 'vendeur') {
+                return new RedirectResponse(
+                    $this->urlGenerator->generate('vendeur_dashboard')
+                );
+            }
         }
 
-        return new RedirectResponse($this->urlGenerator->generate('app_home'));
+        return new RedirectResponse(
+            $this->urlGenerator->generate('app_login')
+        );
     }
 
     protected function getLoginUrl(Request $request): string
@@ -77,11 +100,14 @@ final class LegacyLoginAuthenticator extends AbstractLoginFormAuthenticator
 
     public function supports(Request $request): bool
     {
-        return $request->attributes->get('_route') === 'app_login' && $request->isMethod('POST');
+        return $request->attributes->get('_route') === 'app_login'
+            && $request->isMethod('POST');
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): Response
-    {
+    public function onAuthenticationFailure(
+        Request $request,
+        AuthenticationException $exception
+    ): Response {
         $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
 
         return new RedirectResponse($this->getLoginUrl($request));

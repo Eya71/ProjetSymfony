@@ -11,6 +11,7 @@ use App\Service\LegacyImagePathResolver;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\Request;
 
 final class ClientInterfaceController extends AbstractController
 {
@@ -21,6 +22,7 @@ final class ClientInterfaceController extends AbstractController
         MessageRepository $messageRepository,
         ProduitRepository $produitRepository,
         LegacyImagePathResolver $imagePathResolver,
+        Request $request,
     ): Response {
         $this->denyAccessUnlessGranted('ROLE_CLIENT');
 
@@ -39,9 +41,34 @@ final class ClientInterfaceController extends AbstractController
             $messageCount = $messageRepository->countUnreadForReceiver($username);
         }
 
-        $produits = $produitRepository->findLatestWithVendeur();
+        $search = $request->query->get('search');
 
-        return $this->render('client/index.html.twig', [
+        if ($search) {
+
+            $produits = $produitRepository
+                ->createQueryBuilder('p')
+
+                ->where('p.nomProduit LIKE :search')
+
+                ->setParameter(
+                    'search',
+                    '%' . $search . '%'
+                )
+
+                ->orderBy('p.id', 'DESC')
+
+                ->getQuery()
+
+                ->getResult();
+
+        } else {
+
+            $produits = $produitRepository
+                ->findLatestWithVendeur();
+
+        }
+
+        return $this->render('client/index.html.twig',  [
             'username' => $username,
             'photoUrl' => $imagePathResolver->profile($client?->getIdPhoto()),
             'notifCount' => $notifCount,
@@ -59,5 +86,56 @@ final class ClientInterfaceController extends AbstractController
         }
 
         return $images;
+    }
+    #[Route('/search-products', name: 'search_products')]
+    public function searchProducts(
+        Request $request,
+        ProduitRepository $produitRepository,
+        LegacyImagePathResolver $imagePathResolver
+    ): Response {
+
+        $query = $request->query->get('q');
+
+        if (!$query) {
+
+            return $this->json([]);
+        }
+
+        $produits = $produitRepository
+            ->createQueryBuilder('p')
+
+            ->where('p.nomProduit LIKE :q')
+
+            ->setParameter(
+                'q',
+                '%' . $query . '%'
+            )
+
+            ->setMaxResults(4)
+
+            ->getQuery()
+
+            ->getResult();
+
+        $results = [];
+
+        foreach ($produits as $produit) {
+
+            $results[] = [
+
+                'id' => $produit->getId(),
+
+                'nom' => $produit->getNomProduit(),
+
+                'prix' => $produit->getPrix(),
+
+                'image' => $imagePathResolver
+                    ->product(
+                        $produit->getImagePath()
+                    )
+            ];
+        }
+
+        return $this->json($results);
     }
 }

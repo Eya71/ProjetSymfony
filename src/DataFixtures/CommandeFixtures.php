@@ -37,6 +37,7 @@ class CommandeFixtures extends Fixture implements DependentFixtureInterface
         $commande1->setStatut('terminée');
         $commande1->setSource('panier');
         $commande1->setTotal('500.00');
+        $commande1->setcreatedAt(new \DateTimeImmutable('2026-04-22'));
         $manager->persist($commande1);
 
         $commande2 = new Commande();
@@ -45,6 +46,8 @@ class CommandeFixtures extends Fixture implements DependentFixtureInterface
         $commande2->setStatut('terminée');
         $commande2->setSource('deal');
         $commande2->setTotal('95.00');
+        $commande2->setcreatedAt(new \DateTimeImmutable('2026-04-27'));
+
         $manager->persist($commande2);
 
         $commande3 = new Commande();
@@ -54,6 +57,7 @@ class CommandeFixtures extends Fixture implements DependentFixtureInterface
         $commande3->setSource('panier');
         $commande3->setTotal('2100.00');
         $manager->persist($commande3);
+        $commande3->setcreatedAt(new \DateTimeImmutable('2026-04-12'));
 
         $manager->flush();
     }
