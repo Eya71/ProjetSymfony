@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\VendeurRepository;
+use App\Security\LegacyUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -18,28 +19,27 @@ final class VendeurProfileController extends AbstractController
         VendeurRepository $vendeurRepository,
         EntityManagerInterface $entityManager
     ): Response {
-        $session = $request->getSession();
+        $this->denyAccessUnlessGranted('ROLE_VENDEUR');
 
-        $userSession = $session->get('user');
+        $user = $this->getUser();
+        $username = $user instanceof LegacyUser ? $user->getUsername() : '';
 
-        if (!$userSession || empty($userSession['username'])) {
-            return $this->redirectToRoute('app_login');
+        if ($username === '') {
+            return $this->redirectToRoute('app_home');
         }
 
-        $username = $userSession['username'];
-
-        $client = $vendeurRepository->findOneBy([
+        $vendeur = $vendeurRepository->findOneBy([
             'username' => $username,
         ]);
 
-        if (!$client) {
-            throw $this->createNotFoundException('vendeur introuvable');
+        if (!$vendeur) {
+            throw $this->createNotFoundException('Vendeur introuvable');
         }
 
         if ($request->isMethod('POST')) {
-            $client->setEmail($request->request->get('email'));
-            $client->setAdresse($request->request->get('adresse'));
-            $client->setNumTel($request->request->get('num_tel'));
+            $vendeur->setEmail($request->request->get('email'));
+            $vendeur->setAdresse($request->request->get('adresse'));
+            $vendeur->setNumTel($request->request->get('num_tel'));
 
             $imageFile = $request->files->get('image');
 
@@ -49,10 +49,10 @@ final class VendeurProfileController extends AbstractController
                 try {
                     $imageFile->move(
                         $this->getParameter('kernel.project_dir') . '/public/files_profil',
-                        $newFilename       #kernel.project_dir donne le chemin racine de  projet Symfony: C:\Users\DELL\PhpstormProjects\ProjetSymfony#
+                        $newFilename
                     );
 
-                    $client->setIdPhoto('files_profil/' . $newFilename);
+                    $vendeur->setIdPhoto('files_profil/' . $newFilename);
                 } catch (FileException $e) {
                     $this->addFlash('error', 'Erreur lors du téléchargement de la photo.');
                 }
@@ -66,20 +66,7 @@ final class VendeurProfileController extends AbstractController
         }
 
         return $this->render('user_profile/index.html.twig', [
-            'client' => $client,
+            'vendeur' => $vendeur,
         ]);
-    }
-
-    #[Route('/test-login-vendeur', name: 'app_test_login_vendeur')]
-    public function testLogin(Request $request): Response
-    {
-        $session = $request->getSession();
-
-        $session->set('user', [
-            'username' => 'mohamedabbes',
-            'role' => 'vendeur',
-        ]);
-
-        return $this->redirectToRoute('app_vendeur_profile');
     }
 }

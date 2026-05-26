@@ -2,8 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Client;
+use App\Entity\Vendeur;
+use App\Repository\ClientRepository;
+use App\Repository\VendeurRepository;
 use App\Security\LegacyUser;
-use Doctrine\DBAL\Connection;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
@@ -18,7 +22,16 @@ final class AuthController extends AbstractController
     public function login(AuthenticationUtils $authenticationUtils, Request $request): Response
     {
         if ($this->getUser() instanceof LegacyUser) {
-            return $this->redirectToRoute('app_client_interface');
+
+            if ($this->isGranted('ROLE_VENDEUR')) {
+                return $this->redirectToRoute('app_vendeur_commandes');
+            }
+
+            if ($this->isGranted('ROLE_CLIENT')) {
+                return $this->redirectToRoute('app_client_interface');
+            }
+
+            return $this->redirectToRoute('app_login');
         }
 
         return $this->render('auth/login.html.twig', [
@@ -29,9 +42,15 @@ final class AuthController extends AbstractController
     }
 
     #[Route('/signup', name: 'app_signup', methods: ['GET', 'POST'])]
-    public function signup(Request $request, Connection $connection, UserPasswordHasherInterface $passwordHasher): Response
-    {
+    public function signup(
+        Request $request,
+        ClientRepository $clientRepository,
+        VendeurRepository $vendeurRepository,
+        EntityManagerInterface $entityManager,
+        UserPasswordHasherInterface $passwordHasher
+    ): Response {
         $error = '';
+
         $old = [
             'username' => '',
             'tel' => '',
@@ -62,11 +81,11 @@ final class AuthController extends AbstractController
                 }
 
                 if (strlen($password) < 6) {
-                    throw new \RuntimeException('Mot de passe trop court (minimum 6 caracteres).');
+                    throw new \RuntimeException('Mot de passe trop court. Minimum 6 caractères.');
                 }
 
                 if (!in_array($old['role'], ['client', 'vendeur'], true)) {
-                    throw new \RuntimeException('Role invalide.');
+                    throw new \RuntimeException('Rôle invalide.');
                 }
 
                 if ($old['email'] !== '' && !filter_var($old['email'], FILTER_VALIDATE_EMAIL)) {
@@ -74,32 +93,98 @@ final class AuthController extends AbstractController
                 }
 
                 $image = $request->files->get('image');
+
                 if (!$image instanceof UploadedFile) {
                     throw new \RuntimeException('Veuillez ajouter une photo.');
                 }
 
-                $exists = (int) $connection->fetchOne('SELECT COUNT(*) FROM client WHERE username = :username', ['username' => $old['username']])
-                    + (int) $connection->fetchOne('SELECT COUNT(*) FROM vendeur WHERE username = :username', ['username' => $old['username']]);
-                if ($exists > 0) {
-                    throw new \RuntimeException("Ce nom d'utilisateur existe deja.");
-                }
-
-                $safeName = uniqid('', true).'_'.preg_replace('/[^A-Za-z0-9_.-]/', '_', $image->getClientOriginalName());
-                $image->move($this->getParameter('kernel.project_dir').'/public/files_profil', $safeName);
-                $storedPhotoPath = '../files_profil/'.$safeName;
-
-                $user = new LegacyUser($old['username'], $old['role']);
-                $table = $old['role'] === 'vendeur' ? 'vendeur' : 'client';
-                $connection->insert($table, [
+                /*
+                 * Ici on vérifie si le username existe déjà
+                 * avec les Repository, pas avec SELECT.
+                 */
+                $clientExists = $clientRepository->findOneBy([
                     'username' => $old['username'],
-                    'email' => $old['email'],
-                    'adresse' => $old['adresse'],
-                    'num_tel' => $old['tel'],
-                    'id_photo' => $storedPhotoPath,
-                    'pwd' => $passwordHasher->hashPassword($user, $password),
                 ]);
 
-                return $this->redirectToRoute($old['role'] === 'client' ? 'app_login' : 'app_home');
+                $vendeurExists = $vendeurRepository->findOneBy([
+                    'username' => $old['username'],
+                ]);
+
+                if ($clientExists !== null || $vendeurExists !== null) {
+                    throw new \RuntimeException("Ce nom d'utilisateur existe déjà.");
+                }
+
+                /*
+                 * Préparation et upload de la photo.
+                 */
+                $safeName = uniqid('', true) . '_' . preg_replace(
+                        '/[^A-Za-z0-9_.-]/',
+                        '_',
+                        $image->getClientOriginalName()
+                    );
+
+                $image->move(
+                    $this->getParameter('kernel.project_dir') . '/public/files_profil',
+                    $safeName
+                );
+
+                $storedPhotoPath = '../files_profil/' . $safeName;
+
+                /*
+                 * LegacyUser sert à hasher le mot de passe correctement.
+                 */
+                $legacyUser = new LegacyUser($old['username'], $old['role']);
+
+                $hashedPassword = $passwordHasher->hashPassword($legacyUser, $password);
+
+                /*
+                 * Si l'utilisateur choisit Client,
+                 * on crée une entité Client.
+                 */
+                if ($old['role'] === 'client') {
+                    $client = new Client();
+
+                    $client->setUsername($old['username']);
+                    $client->setEmail($old['email']);
+                    $client->setAdresse($old['adresse']);
+                    $client->setNumTel($old['tel']);
+                    $client->setIdPhoto($storedPhotoPath);
+                    $client->setPwd($hashedPassword);
+
+                    $entityManager->persist($client);
+                }
+
+                /*
+                 * Si l'utilisateur choisit Vendeur,
+                 * on crée une entité Vendeur.
+                 */
+                if ($old['role'] === 'vendeur') {
+                    $vendeur = new Vendeur();
+
+                    $vendeur->setUsername($old['username']);
+                    $vendeur->setEmail($old['email']);
+                    $vendeur->setAdresse($old['adresse']);
+                    $vendeur->setNumTel($old['tel']);
+                    $vendeur->setIdPhoto($storedPhotoPath);
+                    $vendeur->setPwd($hashedPassword);
+                    $vendeur->setCreatedAt(new \DateTimeImmutable());
+
+                    $entityManager->persist($vendeur);
+                }
+
+                /*
+                 * Ici Symfony enregistre dans la base.
+                 * Il va faire INSERT automatiquement.
+                 */
+                $entityManager->flush();
+
+                /*
+                 * On garde le rôle choisi pour que le radio button soit coché dans login.
+                 */
+                $request->getSession()->set('last_login_role', $old['role']);
+
+                return $this->redirectToRoute('app_login');
+
             } catch (\Throwable $exception) {
                 $error = $exception->getMessage();
             }

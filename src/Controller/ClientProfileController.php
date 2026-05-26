@@ -21,7 +21,7 @@ final class ClientProfileController extends AbstractController
     ): Response {
         $user = $this->getUser();
         if (!$user instanceof LegacyUser || $user->getLegacyRole() !== 'client') {
-            return $this->redirectToRoute('app_login');
+            return $this->redirectToRoute('app_home');
         }
 
         $username = $user->getUsername();
@@ -68,16 +68,5 @@ final class ClientProfileController extends AbstractController
         ]);
     }
 
-    #[Route('/test-login-client', name: 'app_test_login_client')]
-    public function testLogin(Request $request): Response
-    {
-        $session = $request->getSession();
 
-        $session->set('user', [
-            'username' => 'eyaabbes',
-            'role' => 'client',
-        ]);
-
-        return $this->redirectToRoute('app_client_profile');
-    }
 }

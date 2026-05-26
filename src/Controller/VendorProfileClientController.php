@@ -10,6 +10,7 @@ use App\Repository\DealRequestRepository;
 use App\Repository\ProduitRepository;
 use App\Repository\ReviewRepository;
 use App\Repository\VendeurRepository;
+use App\Security\LegacyUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -31,43 +32,45 @@ final class VendorProfileClientController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response {
         /*
-         * 1. SESSION TEMPORAIRE POUR TESTER SANS LOGIN
+         * 1. Vérifier que l'utilisateur connecté est un client
          *
-         * Interface concernée :
-         * Cela ne s'affiche pas directement dans la page.
-         * Ça sert seulement à dire que le client connecté est "amira".
-         *
-         * Quand ton camarade termine le login,
-         * tu enlèves ce bloc et tu remets la vraie session.
+         * Interface :
+         * Cette partie ne s'affiche pas.
+         * Elle protège seulement la page.
          */
-        $userSession = [
-            'username' => 'amira',
-            'role' => 'client',
-        ];
+        $this->denyAccessUnlessGranted('ROLE_CLIENT');
 
         /*
-         * 2. VÉRIFIER QUE L'UTILISATEUR EST UN CLIENT
+         * 2. Récupérer l'utilisateur connecté avec getUser()
          *
-         * Interface concernée :
-         * Si le rôle n'est pas "client", la page ne s'ouvre pas.
+         * Ici, on ne travaille pas avec session.
+         * Symfony récupère l'utilisateur connecté automatiquement.
          */
-        $role = $userSession['role'] ?? null;
+        $user = $this->getUser();
 
-        if ($role !== 'client') {
-            throw $this->createAccessDeniedException('Cette page est réservée aux clients.');
+        if (!$user instanceof LegacyUser) {
+            return $this->redirectToRoute('app_home');
         }
 
         /*
-         * 3. RÉCUPÉRER LE CLIENT CONNECTÉ
+         * 3. Récupérer le username du client connecté
          *
-         * Interface concernée :
-         * Ce client est utilisé pour :
-         * - savoir s'il peut laisser un avis
-         * - enregistrer son nom dans l'avis
-         * - afficher son username dans la liste des avis après publication
+         * Exemple :
+         * si le client connecté est amira,
+         * $clientUsername = "amira"
+         */
+        $clientUsername = $user->getUsername();
+
+        /*
+         * 4. Récupérer le client depuis la base
+         *
+         * Interface :
+         * Ce client sert à savoir :
+         * - s'il peut laisser un avis
+         * - quel nom afficher dans l'avis
          */
         $client = $clientRepository->findOneBy([
-            'username' => $userSession['username'],
+            'username' => $clientUsername,
         ]);
 
         if (!$client) {
@@ -75,19 +78,21 @@ final class VendorProfileClientController extends AbstractController
         }
 
         /*
-         * 4. RÉCUPÉRER LE VENDEUR DEPUIS L'URL
+         * 5. Récupérer le vendeur depuis l'URL
          *
-         * Exemple d'URL :
+         * Exemple URL :
          * /profil/vendeur/mohamedabbes
          *
-         * Interface concernée :
-         * C'est ce vendeur qui est affiché dans la grande carte en haut :
+         * Ici, $username = "mohamedabbes"
+         *
+         * Interface :
+         * Ce vendeur est affiché dans la grande carte :
          * - photo
          * - username
          * - email
          * - adresse
          * - téléphone
-         * - date d'inscription
+         * - date de création
          */
         $vendor = $vendeurRepository->findOneBy([
             'username' => $username,
@@ -98,13 +103,10 @@ final class VendorProfileClientController extends AbstractController
         }
 
         /*
-         * 5. RÉCUPÉRER LES AVIS DU VENDEUR
+         * 6. Récupérer les avis du vendeur
          *
-         * Interface concernée :
+         * Interface :
          * Section "Avis clients".
-         *
-         * On récupère tous les avis liés à ce vendeur,
-         * du plus récent au plus ancien.
          */
         $reviews = $reviewRepository->findBy(
             ['vendeur_username' => $vendor],
@@ -112,14 +114,10 @@ final class VendorProfileClientController extends AbstractController
         );
 
         /*
-         * 6. CALCULER LA NOTE MOYENNE
+         * 7. Calculer la note moyenne
          *
-         * Interface concernée :
-         * Carte "Note moyenne" en haut à droite.
-         *
-         * Exemple :
-         * si le vendeur a 2 avis : 5 et 3
-         * moyenne = 4/5
+         * Interface :
+         * Bloc "Note moyenne" à droite dans la carte profil.
          */
         $totalReviews = count($reviews);
         $averageRating = 0;
@@ -135,70 +133,45 @@ final class VendorProfileClientController extends AbstractController
         }
 
         /*
-         * 7. STATISTIQUES DU VENDEUR
+         * 8. Statistiques du vendeur
          *
-         * Interface concernée :
-         * Les 4 petites cartes sous le profil :
-         * - Commandes reçues
-         * - Commandes terminées
-         * - Deals acceptés
-         * - Produits publiés
+         * Interface :
+         * Les 4 cartes sous le profil vendeur.
          */
 
-        /*
-         * Carte 1 : Commandes reçues
-         * On compte toutes les commandes liées à ce vendeur.
-         */
+        // Carte 1 : Commandes reçues
         $commandesRecues = $commandeRepository->count([
             'vendeur' => $vendor,
         ]);
 
-        /*
-         * Carte 2 : Commandes terminées
-         * On compte seulement les commandes de ce vendeur
-         * dont le statut est "terminée".
-         *
-         * Important :
-         * Si dans ta base tu écris "terminee", "Terminée" ou "livrée",
-         * il faut changer la valeur ici.
-         */
+        // Carte 2 : Commandes terminées
         $commandesTerminees = $commandeRepository->count([
             'vendeur' => $vendor,
             'statut' => 'terminée',
         ]);
 
-        /*
-         * Carte 3 : Deals acceptés
-         * Maintenant que tu as ajouté un champ status dans DealRequest,
-         * on compte seulement les deals acceptés.
-         *
-         * Important :
-         * La valeur "accepté" doit être exactement la même que dans ta base.
-         * Si tu utilises "accepted", remplace "accepté" par "accepted".
-         */
+        // Carte 3 : Deals acceptés
         $dealsAcceptes = $dealRequestRepository->count([
             'vendeur_username' => $vendor,
             'status' => 'accepté',
         ]);
 
-        /*
-         * Carte 4 : Produits publiés
-         * On compte tous les produits liés à ce vendeur.
-         */
+        // Carte 4 : Produits publiés
         $produitsPublies = $produitRepository->count([
             'vendeur_username' => $vendor,
         ]);
 
         /*
-         * 8. CHERCHER LES DEALS QUE LE CLIENT PEUT NOTER
+         * 9. Chercher les deals que ce client peut noter
          *
-         * Interface concernée :
+         * Interface :
          * Formulaire "Laisser un nouvel avis".
          *
-         * Le client peut laisser un avis seulement si :
-         * - il a un deal avec ce vendeur
+         * Le client peut noter seulement si :
+         * - le deal appartient à ce client
+         * - le deal appartient à ce vendeur
          * - le deal est accepté
-         * - le deal n'a pas encore d'avis
+         * - le deal n'a pas encore de review
          */
         $deals = $dealRequestRepository->findBy([
             'client_username' => $client,
@@ -209,60 +182,33 @@ final class VendorProfileClientController extends AbstractController
         $reviewableDeals = [];
 
         foreach ($deals as $deal) {
-            /*
-             * Si getReview() retourne null,
-             * ça veut dire que ce deal n'a pas encore été noté.
-             */
             if ($deal->getReview() === null) {
                 $reviewableDeals[] = $deal;
             }
         }
 
         /*
-         * 9. FORMULAIRE D'AVIS
+         * 10. Formulaire d'avis
          *
-         * Interface concernée :
+         * Interface :
          * Section "Laisser un nouvel avis".
-         *
-         * Si $reviewableDeals contient au moins un deal,
-         * on affiche le formulaire.
-         *
-         * Sinon, on affiche :
-         * "Vous ne pouvez pas encore laisser un avis pour ce vendeur."
          */
         $review = new Review();
         $reviewForm = null;
 
         if (count($reviewableDeals) > 0) {
-            /*
-             * On crée le formulaire ReviewType.
-             * On lui envoie seulement les deals que le client peut noter.
-             */
             $form = $this->createForm(ReviewType::class, $review, [
                 'reviewable_deals' => $reviewableDeals,
             ]);
 
-            /*
-             * handleRequest lit la requête.
-             * Si le formulaire a été envoyé,
-             * Symfony remplit automatiquement :
-             * - id_deal
-             * - rating
-             * - commentaire
-             */
             $form->handleRequest($request);
 
-            /*
-             * Si le formulaire est envoyé et valide,
-             * on enregistre l'avis.
-             */
             if ($form->isSubmitted() && $form->isValid()) {
                 $selectedDeal = $review->getIdDeal();
 
                 /*
                  * Sécurité :
-                 * Même si quelqu'un modifie le HTML,
-                 * on vérifie que le deal choisi est bien autorisé.
+                 * On vérifie que le deal choisi est bien dans les deals autorisés.
                  */
                 if (!in_array($selectedDeal, $reviewableDeals, true)) {
                     $this->addFlash('error', 'Vous ne pouvez pas noter ce deal.');
@@ -273,26 +219,15 @@ final class VendorProfileClientController extends AbstractController
                 }
 
                 /*
-                 * Ici on complète les champs que le client
-                 * ne doit pas choisir lui-même.
-                 *
-                 * Interface concernée :
-                 * Après l'enregistrement, l'avis apparaît dans "Avis clients".
+                 * On complète les champs que le client ne choisit pas lui-même.
                  */
                 $review->setClientUsername($client);
                 $review->setVendeurUsername($vendor);
                 $review->setCreatedAt(new \DateTimeImmutable());
 
-                /*
-                 * persist prépare l'enregistrement.
-                 * flush exécute l'INSERT dans la base.
-                 */
                 $entityManager->persist($review);
                 $entityManager->flush();
 
-                /*
-                 * Message affiché en haut de la page.
-                 */
                 $this->addFlash('success', 'Votre avis a été ajouté avec succès.');
 
                 return $this->redirectToRoute('app_vendor_profile_client', [
@@ -300,60 +235,26 @@ final class VendorProfileClientController extends AbstractController
                 ]);
             }
 
-            /*
-             * createView transforme le formulaire PHP
-             * en formulaire utilisable dans Twig.
-             */
             $reviewForm = $form->createView();
         }
 
         /*
-         * 10. ENVOYER LES DONNÉES AU TWIG
+         * 11. Envoyer les données au Twig
          *
-         * Interface concernée :
-         * Chaque variable ici est utilisée dans index.html.twig.
+         * Interface :
+         * Toutes ces variables sont utilisées dans index.html.twig.
          */
         return $this->render('vendor_profile_client/index.html.twig', [
-            /*
-             * Grande carte profil vendeur :
-             * photo, username, email, adresse, téléphone, createdAt.
-             */
             'vendor' => $vendor,
-
-            /*
-             * Client connecté.
-             * Pas beaucoup affiché directement ici,
-             * mais utile pour la logique de l'avis.
-             */
             'client' => $client,
-
-            /*
-             * Section Avis clients.
-             */
             'reviews' => $reviews,
-
-            /*
-             * Carte Note moyenne.
-             */
             'averageRating' => $averageRating,
             'totalReviews' => $totalReviews,
-
-            /*
-             * Les 4 cartes statistiques.
-             */
             'commandesRecues' => $commandesRecues,
             'commandesTerminees' => $commandesTerminees,
             'dealsAcceptes' => $dealsAcceptes,
             'produitsPublies' => $produitsPublies,
-
-            /*
-             * Deals disponibles pour laisser un avis.
-             */
             'reviewableDeals' => $reviewableDeals,
-
-            /*
-             * Formulaire d'avis.
-             */
             'reviewForm' => $reviewForm,
         ]);
     }
