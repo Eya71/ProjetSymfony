@@ -82,10 +82,10 @@
                                 <p><strong>Prix : </strong>{{ prod.prix|default('0') }} DT</p>
 
                                 <div class="product-actions">
-                                    <a class="small-btn" href="{{ path('produit_details', {'id': prod.id_produit}) }}">Voir produit</a>
+                                    <a class="small-btn" href="{{ path('produit_details', {'id': prod.id}) }}">Voir produit</a>
                                     {% if app.user %}
                                         <form action="{{ path('panier_add') }}" method="post" class="add-to-cart-form">
-                                            <input type="hidden" name="id_produit" value="{{ prod.id_produit|default(0) }}">
+                                            <input type="hidden" name="id_produit" value="{{ prod.id|default(0) }}">
                                             <input type="hidden" name="redirect_to" value="{{ path('app_home') }}">
                                             <button class="primary-btn product-cart-btn" type="submit">Ajouter au panier</button>
                                         </form>

@@ -131,7 +131,7 @@
                                 <p><strong>Stock :</strong> {{ prod.quantite|default(0) < 0 ? 0 : prod.quantite|default(0) }}</p>
 
                                 <div class="product-actions">
-                                    <a class="small-btn" href="{{ path('produit_details', {'id': prod.id_produit}) }}">Voir produit</a>
+                                    <a class="small-btn" href="{{ path('produit_details', {'id': prod.id}) }}">Voir produit</a>
                                     <form action="{{ path('panier_add') }}" method="post" class="add-to-cart-form">
                                         <input type="hidden" name="id_produit" value="{{ prod.id_produit|default(0) }}">
                                         <input type="hidden" name="redirect_to" value="{{ path('app_client_interface') }}">
