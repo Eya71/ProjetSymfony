@@ -1,5 +1,6 @@
 <div class="overlay"
-     id="overlay">
+     id="overlay"
+     style="display: none;">
 
 </div>
 
@@ -37,7 +38,7 @@
 
             </h4>
 
-            <a href="app_client_profile">
+            <a href="{{ path('app_client_profile') }}">
 
                 <i class="fa-regular fa-user"></i>
                 Mon compte
@@ -79,7 +80,7 @@
 
             </a>
 
-            <a href="{{ path('app_home') }}">
+            <a href="{{ path('app_logout') }}">
 
                 <i class="fa-solid fa-right-from-bracket"></i>
                 Déconnexion

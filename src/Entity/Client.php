@@ -5,14 +5,17 @@ namespace App\Entity;
 use App\Repository\ClientRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ClientRepository::class)]
 class Client
 {
     #[ORM\Id]
-    #[ORM\Column(name: 'username', length: 30)]
+    #[ORM\GeneratedValue]
+    #[ORM\Column]
+    private ?int $id = null;
+
+    #[ORM\Column(length: 50, unique: true)]
     private ?string $username = null;
 
     #[ORM\Column(length: 100)]
@@ -24,14 +27,11 @@ class Client
     #[ORM\Column(name: 'num_tel', length: 20)]
     private ?string $numTel = null;
 
-    #[ORM\Column(name: 'idphoto', length: 255, nullable: true)]
+    #[ORM\Column(name: 'id_photo', length: 200)]
     private ?string $idPhoto = null;
 
-    #[ORM\Column(name: 'password', length: 255, nullable: true)]
-    private ?string $password = null;
-
-    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $createdAt = null;
+    #[ORM\Column(name: 'pwd', length: 100)]
+    private ?string $pwd = null;
 
     /**
      * @var Collection<int, Demande>
@@ -42,13 +42,18 @@ class Client
     /**
      * @var Collection<int, Review>
      */
-    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'clientUsername')]
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'client_username')]
     private Collection $reviews;
 
     public function __construct()
     {
         $this->demandes = new ArrayCollection();
         $this->reviews = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
     }
 
     public function getUsername(): ?string
@@ -111,26 +116,26 @@ class Client
         return $this;
     }
 
-    public function getPassword(): ?string
+    public function getPwd(): ?string
     {
-        return $this->password;
+        return $this->pwd;
     }
 
-    public function setPassword(?string $password): static
+    public function setPwd(string $pwd): static
     {
-        $this->password = $password;
+        $this->pwd = $pwd;
 
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getPassword(): ?string
     {
-        return $this->createdAt;
+        return $this->pwd;
     }
 
-    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    public function setPassword(?string $password): static
     {
-        $this->createdAt = $createdAt;
+        $this->pwd = $password;
 
         return $this;
     }

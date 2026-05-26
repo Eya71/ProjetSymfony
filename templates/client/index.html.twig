@@ -31,7 +31,7 @@
         </div>
 
         <div class="icons quick-actions">
-            <a href="#" class="icon-item">
+            <a href="{{ path('app_client_profile') }}" class="icon-item">
                 <i class="fa-regular fa-user" style="color:#B197FC;"></i>
                 <span>Mon compte</span>
             </a>
@@ -51,7 +51,7 @@
                 <span>Mes demandes</span>
             </a>
 
-            <a href="#" class="icon-item">
+            <a href="{{ path('app_client_profile') }}" class="icon-item">
                 <i class="fa-solid fa-bell" style="color:#74C0FC;"></i>
                 <span>Notification</span>
                 {% if notifCount > 0 %}
@@ -59,7 +59,7 @@
                 {% endif %}
             </a>
 
-            <a href="#" class="icon-item">
+            <a href="{{ path('demande_index') }}" class="icon-item">
                 <i class="fa-solid fa-envelope" style="color:#B197FC;"></i>
                 <span>Messages</span>
                 {% if messageCount > 0 %}
@@ -73,8 +73,6 @@
         <img src="{{ asset('files_profil/img.png') }}" alt="promo" class="hero-img">
     </div>
 
-    <div class="overlay" id="overlay" onclick="window.importySidebarClose && window.importySidebarClose()"></div>
-
     <aside class="side-menu client-side-menu" id="sideMenu" aria-hidden="true">
         <div class="side-header">
             <a class="brand" aria-label="Importy - Accueil">
@@ -87,12 +85,12 @@
 
         <div class="section">
             <h4>Navigation</h4>
-            <a href="#"><i class="fa-regular fa-user"></i> Mon compte</a>
+            <a href="{{ path('app_client_profile') }}"><i class="fa-regular fa-user"></i> Mon compte</a>
             <a href="{{ path('panier_index') }}"><i class="fa-solid fa-bag-shopping"></i> Panier</a>
             <a href="{{ path('demande_index') }}"><i class="fa-solid fa-plus"></i> Demande</a>
             <a href="{{ path('mes_demandes') }}"><i class="fa-solid fa-list-check"></i> Mes demandes</a>
-            <a href="#"><i class="fa-solid fa-bell"></i> Notification</a>
-            <a href="#"><i class="fa-solid fa-envelope"></i> Message</a>
+            <a href="{{ path('demande_index') }}"><i class="fa-solid fa-bell"></i> Notification</a>
+            <a href="{{ path('demande_index') }}"><i class="fa-solid fa-envelope"></i> Message</a>
             <a href="{{ path('app_logout') }}" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Se deconnecter</a>
         </div>
     </aside>
@@ -123,17 +121,17 @@
                             <article class="product-card searchable-product">
                                 <span class="product-badge">{{ prod.categorie|default('Sans categorie') }}</span>
                                 <div class="product-image">
-                                    <img src="{{ asset(prod.resolved_image) }}" alt="{{ prod.nom_produit|default('Produit') }}">
+                                    <img src="{{ asset(productImages[prod.id]|default('files_profil/logo.png')) }}" alt="{{ prod.nomProduit|default('Produit') }}">
                                 </div>
 
-                                <h3>{{ prod.nom_produit|default('Produit') }}</h3>
+                                <h3>{{ prod.nomProduit|default('Produit') }}</h3>
                                 <p><strong>Prix :</strong> {{ prod.prix|default('0') }} DT</p>
                                 <p><strong>Stock :</strong> {{ prod.quantite|default(0) < 0 ? 0 : prod.quantite|default(0) }}</p>
 
                                 <div class="product-actions">
                                     <a class="small-btn" href="{{ path('produit_details', {'id': prod.id}) }}">Voir produit</a>
                                     <form action="{{ path('panier_add') }}" method="post" class="add-to-cart-form">
-                                        <input type="hidden" name="id_produit" value="{{ prod.id_produit|default(0) }}">
+                                        <input type="hidden" name="id_produit" value="{{ prod.id|default(0) }}">
                                         <input type="hidden" name="redirect_to" value="{{ path('app_client_interface') }}">
                                         <button class="primary-btn product-cart-btn" type="submit" {{ prod.quantite|default(0) <= 0 ? 'disabled' : '' }}>
                                             {{ prod.quantite|default(0) <= 0 ? 'Indisponible' : 'Ajouter au panier' }}
