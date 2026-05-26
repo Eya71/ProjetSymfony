@@ -51,20 +51,20 @@
                 <span>Mes demandes</span>
             </a>
 
-            <a href="{{ path('app_client_profile') }}" class="icon-item">
+            <a href="{{ path('app_notifications_index') }}" class="icon-item">
                 <i class="fa-solid fa-bell" style="color:#74C0FC;"></i>
                 <span>Notification</span>
-                {% if notifCount > 0 %}
-                    <span class="badge">{{ notifCount }}</span>
-                {% endif %}
+                <span class="badge {{ notifCount == 0 ? 'badge-hidden' : '' }}"
+                      data-notif-badge
+                      {{ notifCount == 0 ? 'style="display:none"' : '' }}>{{ notifCount }}</span>
             </a>
 
-            <a href="{{ path('demande_index') }}" class="icon-item">
+            <a href="{{ path('app_messagerie_index') }}" class="icon-item">
                 <i class="fa-solid fa-envelope" style="color:#B197FC;"></i>
                 <span>Messages</span>
-                {% if messageCount > 0 %}
-                    <span class="badge">{{ messageCount }}</span>
-                {% endif %}
+                <span class="badge {{ messageCount == 0 ? 'badge-hidden' : '' }}"
+                      data-message-badge
+                      {{ messageCount == 0 ? 'style="display:none"' : '' }}>{{ messageCount }}</span>
             </a>
         </div>
     </header>
@@ -89,8 +89,8 @@
             <a href="{{ path('panier_index') }}"><i class="fa-solid fa-bag-shopping"></i> Panier</a>
             <a href="{{ path('demande_index') }}"><i class="fa-solid fa-plus"></i> Demande</a>
             <a href="{{ path('mes_demandes') }}"><i class="fa-solid fa-list-check"></i> Mes demandes</a>
-            <a href="{{ path('demande_index') }}"><i class="fa-solid fa-bell"></i> Notification</a>
-            <a href="{{ path('demande_index') }}"><i class="fa-solid fa-envelope"></i> Message</a>
+            <a href="{{ path('app_notifications_index') }}"><i class="fa-solid fa-bell"></i> Notification</a>
+            <a href="{{ path('app_messagerie_index') }}"><i class="fa-solid fa-envelope"></i> Message</a>
             <a href="{{ path('app_logout') }}" id="logoutLink"><i class="fa-solid fa-right-from-bracket"></i> Se deconnecter</a>
         </div>
     </aside>
@@ -154,4 +154,5 @@
 
     {% include 'partials/_client_script.html.twig' %}
     {% include 'partials/_footer.html.twig' %}
+    <script src="{{ asset('js/notifications.js') }}" defer></script>
 {% endblock %}
