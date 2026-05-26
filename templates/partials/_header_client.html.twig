@@ -29,16 +29,12 @@
              alt="Importy">
 
     </a>
+    <a href="{{ path('app_client_interface') }}"
+       class="back-client-btn">
 
-    <div class="search">
+        ← Retour interface client
 
-        <i class="fa fa-search"></i>
-
-        <input type="text"
-               id="productSearch"
-               placeholder="Rechercher un produit">
-
-    </div>
+    </a>
     {% if app.user %}
 
         <div class="icons quick-actions">
@@ -141,7 +137,7 @@
 
         <div class="icons quick-actions">
 
-            <a href="#"
+            <a href="{{ path('app_login') }}"
                class="icon-item">
 
                 <i class="fa-regular fa-user"></i>

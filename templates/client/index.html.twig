@@ -25,10 +25,18 @@
             <img class="logo-img" src="{{ asset('files_profil/logo.png') }}" alt="Importy">
         </a>
 
-        <div class="search">
+        <form method="GET"
+              action="{{ path('app_client_interface') }}"
+              class="search-form">
+
             <i class="fa fa-search"></i>
-            <input type="text" id="productSearch" placeholder="Rechercher un produit dans la base de donnees...">
-        </div>
+
+            <input type="text"
+                   name="search"
+                   value="{{ app.request.get('search') }}"
+                   placeholder="Rechercher un produit dans la base de données...">
+
+        </form>
 
         <div class="icons quick-actions">
             <a href="{{ path('app_client_profile') }}" class="icon-item">

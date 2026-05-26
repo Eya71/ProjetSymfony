@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\CommandeRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: CommandeRepository::class)]
 class Commande
@@ -24,6 +26,11 @@ class Commande
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?Client $client = null;
+    #[ORM\OneToMany(
+        mappedBy: 'commande',
+        targetEntity: CommandeItem::class
+    )]
+    private Collection $commandeItems;
 
     #[ORM\Column(length: 50)]
     private ?string $statut = null;
@@ -34,6 +41,8 @@ class Commande
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $total = null;
 
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $createdAt = null;
     public function getId(): ?int
     {
         return $this->id;
@@ -107,6 +116,28 @@ class Commande
     public function setTotal(string $total): static
     {
         $this->total = $total;
+
+        return $this;
+    }
+    public function __construct()
+    {
+        $this->commandeItems = new ArrayCollection();
+    }
+    /**
+     * @return Collection<int, CommandeItem>
+     */
+    public function getCommandeItems(): Collection
+    {
+        return $this->commandeItems;
+    }
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeInterface $createdAt): static
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }

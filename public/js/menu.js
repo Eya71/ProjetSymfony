@@ -52,16 +52,3 @@ if (overlay) {
   overlay.addEventListener("click", closeAll);
 }
 
-const iconItems = document.querySelectorAll(".icon-item");
-
-iconItems.forEach(item => {
-  item.addEventListener("click", function(e) {
-
-    
-    if (!item.classList.contains("login-btn")) {
-      e.preventDefault();
-      openMenu();
-    }
-
-  });
-});

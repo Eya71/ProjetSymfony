@@ -14,11 +14,13 @@ class CommandeItem
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Commande $id_commande = null;
+    #[ORM\ManyToOne(inversedBy: 'commandeItems')]
+    #[ORM\JoinColumn(name: 'id_commande', referencedColumnName: 'id')]
+    private ?Commande $commande = null;
 
-    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    private ?Produit $id_produit = null;
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(name: 'id', referencedColumnName: 'id')]
+    private ?Produit $produit = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $prix_unitaire = null;
@@ -37,26 +39,26 @@ class CommandeItem
         return $this->id;
     }
 
-    public function getIdCommande(): ?Commande
+    public function getCommande(): ?Commande
     {
-        return $this->id_commande;
+        return $this->commande;
     }
 
-    public function setIdCommande(?Commande $id_commande): static
+    public function setCommande(?Commande $commande): static
     {
-        $this->id_commande = $id_commande;
+        $this->commande = $commande;
 
         return $this;
     }
 
-    public function getIdProduit(): ?Produit
+    public function getProduit(): ?Produit
     {
-        return $this->id_produit;
+        return $this->produit;
     }
 
-    public function setIdProduit(?Produit $id_produit): static
+    public function setProduit(?Produit $produit): static
     {
-        $this->id_produit = $id_produit;
+        $this->produit = $produit;
 
         return $this;
     }

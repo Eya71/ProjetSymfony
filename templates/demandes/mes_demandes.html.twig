@@ -1,4 +1,5 @@
 {% extends 'partials/client_layout.html.twig' %}
+
 {% block stylesheets %}
 
     {{ parent() }}
@@ -6,13 +7,19 @@
     <link rel="stylesheet"
           href="{{ asset('css/demande.css') }}">
 
+{% endblock %}
+
+{% block page_title %}
+
+    Mes demandes
 
 {% endblock %}
-{% block page_title %} Mes demandes {% endblock %}
+
 {% block page_content %}
 
+    <div class="page-demandes">
 
-    <div class="top-actions">
+        <div class="demandes-header">
 
         <span class="count-pill">
 
@@ -20,57 +27,95 @@
 
         </span>
 
-    </div>
+            <a href="{{ path('demande_index') }}"
+               class="new-demand-btn">
 
-    <div class="container">
+                + Nouvelle demande
 
-        {% for demande in demandes %}
+            </a>
 
-            <div class="card">
+        </div>
 
-                <img src="{{ asset(demande.imagePath) }}"
-                     alt="{{ demande.nomProduit }}">
+        <div class="container">
 
-                <h3>
+            {% for demande in demandes %}
 
-                    {{ demande.nomProduit }}
+                <div class="demande-card">
 
-                </h3>
+                    <div class="image-wrapper">
 
-                <p>
+                        <img src="{{ asset(demande.imagePath) }}"
+                             alt="{{ demande.nomProduit }}">
 
-                    {{ demande.createdAt|date('d/m/Y') }}
+                    </div>
 
-                </p>
+                    <div class="card-content">
 
-                <p class="etat">
+                        <h3>
 
-                    {{ demande.etat }}
+                            {{ demande.nomProduit }}
 
-                </p>
+                        </h3>
 
-            </div>
+                        <p class="prix">
 
-        {% else %}
+                            {{ demande.prix }} DT
 
-            <div class="empty-state">
+                        </p>
 
-                <p>
+                        <p class="date">
 
-                    Vous n'avez encore aucune demande.
+                            {{ demande.createdAt|date('d/m/Y') }}
 
-                </p>
+                        </p>
 
-                <a class="add-btn"
-                   href="{{ path('demande_index') }}">
+                        <span class="etat-badge">
 
-                    Publier ma première demande
+                        {{ demande.etat }}
 
-                </a>
+                    </span>
 
-            </div>
+                        <a href="#"
+                           class="details-btn">
 
-        {% endfor %}
+                            Voir détails
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <i class="fa-regular fa-folder-open"></i>
+
+                    <h3>
+
+                        Aucune demande
+
+                    </h3>
+
+                    <p>
+
+                        Vous n'avez encore publié aucune demande.
+
+                    </p>
+
+                    <a class="add-btn"
+                       href="{{ path('demande_index') }}">
+
+                        Publier ma première demande
+
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
 
     </div>
 
