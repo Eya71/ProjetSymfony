@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="{{ asset('css/commande_vendeur.css') }}">
 {% endblock %}
 
-
 {% block body %}
-
 
     <main class="vendor-shell">
 
@@ -29,20 +27,44 @@
             </div>
         </section>
 
+        {# FILTRE PAR ORIGINE #}
         <section class="vendor-filter-row">
-            <a href="{{ path('app_vendeur_commandes', { type: 'all' }) }}"
+            <a href="{{ path('app_vendeur_commandes', { type: 'all', etat: etat }) }}"
                class="vendor-filter-chip {{ type == 'all' ? 'active' : '' }}">
                 Toutes
             </a>
 
-            <a href="{{ path('app_vendeur_commandes', { type: 'panier' }) }}"
+            <a href="{{ path('app_vendeur_commandes', { type: 'panier', etat: etat }) }}"
                class="vendor-filter-chip {{ type == 'panier' ? 'active' : '' }}">
                 Depuis panier
             </a>
 
-            <a href="{{ path('app_vendeur_commandes', { type: 'demande' }) }}"
+            <a href="{{ path('app_vendeur_commandes', { type: 'demande', etat: etat }) }}"
                class="vendor-filter-chip {{ type == 'demande' ? 'active' : '' }}">
                 Après demande
+            </a>
+        </section>
+
+        {# FILTRE PAR STATUT #}
+        <section class="vendor-filter-row">
+            <a href="{{ path('app_vendeur_commandes', { type: type, etat: 'all' }) }}"
+               class="vendor-filter-chip {{ etat == 'all' ? 'active' : '' }}">
+                Toutes
+            </a>
+
+            <a href="{{ path('app_vendeur_commandes', { type: type, etat: 'en_cours' }) }}"
+               class="vendor-filter-chip {{ etat == 'en_cours' ? 'active' : '' }}">
+                En cours
+            </a>
+
+            <a href="{{ path('app_vendeur_commandes', { type: type, etat: 'termine' }) }}"
+               class="vendor-filter-chip {{ etat == 'termine' ? 'active' : '' }}">
+                Terminées
+            </a>
+
+            <a href="{{ path('app_vendeur_commandes', { type: type, etat: 'annule' }) }}"
+               class="vendor-filter-chip {{ etat == 'annule' ? 'active' : '' }}">
+                Annulées
             </a>
         </section>
 
@@ -50,7 +72,7 @@
 
             <div class="vendor-empty-box">
                 <h3>Aucune commande trouvée</h3>
-                <p>Vous n’avez aucune commande pour le moment.</p>
+                <p>Vous n’avez aucune commande pour ce filtre.</p>
             </div>
 
         {% else %}
@@ -74,20 +96,20 @@
                                     </h3>
 
                                     <div class="vendor-meta-row">
-                                    <span class="vendor-chip">
-                                        <i class="fa-regular fa-user"></i>
-                                        {{ commande.client.username }}
-                                    </span>
+                                        <span class="vendor-chip">
+                                            <i class="fa-regular fa-user"></i>
+                                            {{ commande.client.username }}
+                                        </span>
 
                                         <span class="vendor-chip strong">
-                                        {{ commande.source }}
-                                    </span>
+                                            {{ commande.source }}
+                                        </span>
                                     </div>
                                 </div>
 
-                                <span class="vendor-status-chip {{ commande.statut }}">
-                                {{ commande.statut }}
-                            </span>
+                                <span class="vendor-status-chip {{ commande.statut|replace({' ': '-', '_': '-'}) }}">
+                                    {{ commande.statut }}
+                                </span>
                             </div>
 
                             <p>
@@ -100,15 +122,16 @@
                                   class="vendor-status-form">
 
                                 <input type="hidden" name="type" value="{{ type }}">
+                                <input type="hidden" name="etat" value="{{ etat }}">
 
                                 <label>Changer le statut :</label>
 
                                 <select name="statut">
-                                    <option value="termine" {{ commande.statut == 'termine' ? 'selected' : '' }}>
+                                    <option value="termine" {{ commande.statut == 'termine' or commande.statut == 'terminé' ? 'selected' : '' }}>
                                         Terminé
                                     </option>
 
-                                    <option value="annule" {{ commande.statut == 'annule' ? 'selected' : '' }}>
+                                    <option value="annule" {{ commande.statut == 'annule' or commande.statut == 'annulé' ? 'selected' : '' }}>
                                         Annulé
                                     </option>
                                 </select>
@@ -132,4 +155,6 @@
 
 {% endblock %}
 
-{% block javascripts %}<script src="{{ asset('js/menu.js') }}"></script>{% endblock %}
+{% block javascripts %}
+    <script src="{{ asset('js/menu.js') }}"></script>
+{% endblock %}

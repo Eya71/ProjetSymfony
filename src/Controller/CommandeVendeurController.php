@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\Commande;
 use App\Repository\CommandeRepository;
 use App\Repository\VendeurRepository;
-// LegacyUser représente l'utilisateur connecté dans ton système de sécurité Symfony
 use App\Security\LegacyUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,17 +14,6 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class CommandeVendeurController extends AbstractController
 {
-    /*
-     * Cette route affiche la page des commandes du vendeur.
-     *
-     * URL :
-     * /vendeur/commandes
-     *
-     * Nom de la route :
-     * app_vendeur_commandes
-     *
-     * Cette méthode sert à afficher la liste des commandes du vendeur connecté.
-     */
     #[Route('/vendeur/commandes', name: 'app_vendeur_commandes')]
     public function index(
         Request $request,
@@ -33,147 +21,194 @@ final class CommandeVendeurController extends AbstractController
         VendeurRepository $vendeurRepository
     ): Response {
         /*
-         * On vérifie que l'utilisateur connecté a bien le rôle ROLE_VENDEUR.
+         * On vérifie que l'utilisateur connecté est bien un vendeur.
          *
-         * Si l'utilisateur n'est pas vendeur, Symfony bloque l'accès automatiquement.
+         * Si l'utilisateur n'a pas ROLE_VENDEUR,
+         * Symfony bloque l'accès à cette page.
          */
         $this->denyAccessUnlessGranted('ROLE_VENDEUR');
 
         /*
          * On récupère l'utilisateur connecté avec getUser().
          *
-         * Dans ton projet Symfony, on n'utilise pas $_SESSION comme dans PHP classique.
-         * On utilise getUser() parce que l'utilisateur est géré par le système de sécurité Symfony.
+         * Dans ton projet Symfony, l'utilisateur connecté est un LegacyUser.
+         * On ne travaille pas avec $_SESSION directement.
          */
         $user = $this->getUser();
 
         /*
-         * On vérifie que l'utilisateur est bien un LegacyUser.
+         * On récupère le username de l'utilisateur connecté.
          *
-         * Si oui, on récupère son username.
-         * Sinon, on met une chaîne vide.
+         * Exemple :
+         * si le vendeur connecté est "mohamedabbes",
+         * alors $username = "mohamedabbes".
          */
         $username = $user instanceof LegacyUser ? $user->getUsername() : '';
 
         /*
-         * Maintenant qu'on a le username du vendeur connecté,
-         * on cherche le vendeur correspondant dans la table vendeur.
-         *
-         * Exemple :
-         * username = "eyaabbes"
-         *
-         * Symfony cherche :
-         * SELECT * FROM vendeur WHERE username = "eyaabbes"
+         * On cherche le vendeur dans la table vendeur
+         * à partir du username récupéré depuis getUser().
          */
         $vendeur = $vendeurRepository->findOneBy([
             'username' => $username,
         ]);
 
         /*
-         * Si aucun vendeur n'est trouvé dans la base,
+         * Si aucun vendeur n'est trouvé,
          * on affiche une erreur 404.
          *
-         * Cela évite d'afficher une page vide ou de provoquer une erreur plus loin.
+         * Cela évite d'afficher des commandes sans vendeur valide.
          */
         if (!$vendeur) {
-            throw $this->createNotFoundException('Vendeur introuvable');
+            throw $this->createNotFoundException('Vendeur introuvable.');
         }
 
         /*
-         * On récupère le filtre depuis l'URL.
+         * type = filtre par origine de commande :
          *
-         * Exemple :
-         * /vendeur/commandes?type=panier
-         *
-         * Si aucun type n'est envoyé, on utilise "all" par défaut.
+         * all     => toutes les commandes
+         * panier  => commandes depuis panier
+         * demande => commandes après demande / deal
          */
         $type = $request->query->get('type', 'all');
 
         /*
-         * On prépare une requête Doctrine avec QueryBuilder.
+         * etat = filtre par statut :
          *
-         * Le QueryBuilder permet d'écrire une requête plus proprement
-         * sans écrire directement du SQL.
+         * all       => tous les statuts
+         * en_cours  => commandes non terminées et non annulées
+         * termine   => commandes terminées
+         * annule    => commandes annulées
+         */
+        $etat = $request->query->get('etat', 'all');
+
+        /*
+         * On prépare la requête Doctrine.
          *
-         * Ici, on récupère les commandes du vendeur connecté.
+         * c représente une commande.
+         *
+         * Important :
+         * on affiche seulement les commandes du vendeur connecté.
          */
         $qb = $commandeRepository->createQueryBuilder('c')
-            /*
-             * c représente la commande.
-             *
-             * On veut seulement les commandes où le vendeur est le vendeur connecté.
-             */
             ->where('c.vendeur = :vendeur')
-
-            /*
-             * On donne la valeur du paramètre :vendeur.
-             */
             ->setParameter('vendeur', $vendeur)
-
-            /*
-             * On trie les commandes par id décroissant.
-             *
-             * Donc les commandes les plus récentes apparaissent en premier.
-             */
             ->orderBy('c.id', 'DESC');
 
         /*
-         * Si le vendeur clique sur le filtre "Depuis panier",
-         * on ajoute une condition :
-         *
-         * source = panier
+         * ==========================
+         * FILTRE PAR ORIGINE
+         * ==========================
+         */
+
+        /*
+         * Si le vendeur clique sur "Depuis panier",
+         * on affiche seulement les commandes dont source = panier.
          */
         if ($type === 'panier') {
-            $qb->andWhere('c.source = :source')
-                ->setParameter('source', 'panier');
+            $qb->andWhere('c.source = :sourcePanier')
+                ->setParameter('sourcePanier', 'panier');
         }
 
         /*
-         * Si le vendeur clique sur le filtre "Après demande",
-         * on ajoute une condition :
+         * Si le vendeur clique sur "Après demande",
+         * on affiche les commandes qui viennent d'une demande.
          *
-         * source = demande
+         * Dans ta base, une commande après demande peut avoir :
+         * - source = demande
+         * - source = deal
+         * - ou bien une relation id_demande non vide
+         *
+         * Donc on accepte ces cas pour que le filtre marche.
          */
         if ($type === 'demande') {
-            $qb->andWhere('c.source = :source')
-                ->setParameter('source', 'demande');
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    'c.source IN (:sourcesDemande)',
+                    'c.id_demande IS NOT NULL'
+                )
+            )
+                ->setParameter('sourcesDemande', [
+                    'demande',
+                    'deal',
+                ]);
         }
 
         /*
-         * Ici, on exécute la requête.
+         * ==========================
+         * FILTRE PAR STATUT
+         * ==========================
+         */
+
+        /*
+         * Si le vendeur clique sur "En cours",
+         * on affiche seulement les commandes non terminées et non annulées.
          *
-         * Résultat :
-         * $commandes contient la liste des commandes trouvées.
+         * Donc on exclut :
+         * - termine
+         * - terminé
+         * - annule
+         * - annulé
+         */
+        if ($etat === 'en_cours') {
+            $qb->andWhere('c.statut NOT IN (:statutsFinis)')
+                ->setParameter('statutsFinis', [
+                    'termine',
+                    'terminé',
+                    'annule',
+                    'annulé',
+                ]);
+        }
+
+        /*
+         * Si le vendeur clique sur "Terminées",
+         * on affiche seulement les commandes terminées.
+         */
+        if ($etat === 'termine') {
+            $qb->andWhere('c.statut IN (:statutsTermines)')
+                ->setParameter('statutsTermines', [
+                    'termine',
+                    'terminé',
+                ]);
+        }
+
+        /*
+         * Si le vendeur clique sur "Annulées",
+         * on affiche seulement les commandes annulées.
+         */
+        if ($etat === 'annule') {
+            $qb->andWhere('c.statut IN (:statutsAnnules)')
+                ->setParameter('statutsAnnules', [
+                    'annule',
+                    'annulé',
+                ]);
+        }
+
+        /*
+         * On exécute la requête.
+         *
+         * $commandes contient les commandes du vendeur connecté,
+         * avec les filtres appliqués.
          */
         $commandes = $qb->getQuery()->getResult();
 
         /*
-         * On envoie les données vers le fichier Twig.
+         * On envoie les données vers Twig.
          *
-         * Le fichier Twig va utiliser :
-         * - commandes : pour afficher la liste
-         * - type : pour savoir quel filtre est actif
+         * Twig va utiliser :
+         * - commandes : pour afficher les cartes
+         * - type : pour garder le filtre origine actif
+         * - etat : pour garder le filtre statut actif
          * - username : pour afficher le nom du vendeur si besoin
          */
         return $this->render('commande_vendeur/index.html.twig', [
             'commandes' => $commandes,
             'type' => $type,
+            'etat' => $etat,
             'username' => $username,
         ]);
     }
 
-    /*
-     * Cette route sert à modifier le statut d'une commande.
-     *
-     * URL :
-     * /vendeur/commande/{id}/statut
-     *
-     * Exemple :
-     * /vendeur/commande/5/statut
-     *
-     * Cette route accepte seulement la méthode POST,
-     * parce qu'on modifie des données dans la base.
-     */
     #[Route('/vendeur/commande/{id}/statut', name: 'app_vendeur_commande_statut', methods: ['POST'])]
     public function updateStatut(
         Commande $commande,
@@ -181,14 +216,12 @@ final class CommandeVendeurController extends AbstractController
         EntityManagerInterface $entityManager
     ): Response {
         /*
-         * On vérifie encore que l'utilisateur est un vendeur.
-         *
-         * Même si la page est protégée, il faut aussi protéger l'action de modification.
+         * On vérifie que l'utilisateur connecté est bien vendeur.
          */
         $this->denyAccessUnlessGranted('ROLE_VENDEUR');
 
         /*
-         * On récupère l'utilisateur connecté.
+         * On récupère l'utilisateur connecté avec getUser().
          */
         $user = $this->getUser();
 
@@ -203,7 +236,7 @@ final class CommandeVendeurController extends AbstractController
          * On vérifie que la commande que le vendeur veut modifier
          * appartient vraiment à ce vendeur.
          *
-         * Sinon, un vendeur pourrait modifier une commande d'un autre vendeur
+         * Sinon, un vendeur pourrait modifier la commande d'un autre vendeur
          * en changeant simplement l'id dans l'URL.
          */
         if ($commande->getVendeur()?->getUsername() !== $username) {
@@ -211,43 +244,50 @@ final class CommandeVendeurController extends AbstractController
         }
 
         /*
-         * On récupère le statut envoyé par le formulaire.
+         * On récupère le statut envoyé par le formulaire Twig.
          *
-         * Dans le Twig, le select s'appelle :
+         * Le champ select dans Twig est :
          * name="statut"
-         *
-         * Donc ici on récupère :
-         * $_POST['statut'] en version Symfony.
          */
         $statut = $request->request->get('statut');
 
-
+        /*
+         * Le vendeur peut seulement choisir :
+         * - termine
+         * - annule
+         *
+         * Si quelqu'un essaie d'envoyer un autre statut,
+         * on bloque l'action.
+         */
+        if (!in_array($statut, ['termine', 'annule'], true)) {
+            throw $this->createAccessDeniedException('Statut non autorisé.');
+        }
 
         /*
          * On modifie le statut de la commande.
          *
          * Exemple :
-         * commande.statut = termine
+         * statut = termine
+         * ou
+         * statut = annule
          */
         $commande->setStatut($statut);
 
         /*
-         * Certaines commandes sont liées à une demande.
+         * On vérifie si cette commande est liée à une demande.
          *
-         * Dans ton ancienne base PHP, tu avais :
-         * commandes.id_demande
-         *
-         * En Symfony, c'est une relation avec l'entité Demande.
+         * Dans ton entité Commande, la relation avec Demande est :
+         * getIdDemande()
          */
         $demande = $commande->getIdDemande();
 
         /*
          * Si la commande est liée à une demande,
-         * on met aussi à jour l'état de cette demande.
+         * on met aussi à jour l'état de la demande.
          */
         if ($demande !== null) {
             /*
-             * Si le vendeur met la commande comme terminée,
+             * Si la commande est terminée,
              * alors la demande devient reçue.
              */
             if ($statut === 'termine') {
@@ -255,7 +295,7 @@ final class CommandeVendeurController extends AbstractController
             }
 
             /*
-             * Si le vendeur annule la commande,
+             * Si la commande est annulée,
              * alors la demande devient annulée.
              */
             if ($statut === 'annule') {
@@ -264,9 +304,9 @@ final class CommandeVendeurController extends AbstractController
         }
 
         /*
-         * flush() enregistre toutes les modifications dans la base.
+         * On enregistre les modifications dans la base.
          *
-         * Ici, Symfony va faire automatiquement :
+         * Symfony va faire automatiquement :
          * UPDATE commande SET statut = ...
          *
          * Et si une demande est liée :
@@ -275,16 +315,15 @@ final class CommandeVendeurController extends AbstractController
         $entityManager->flush();
 
         /*
-         * Après la modification, on retourne vers la page Mes commandes.
+         * Après modification, on revient vers la page des commandes.
          *
-         * On garde aussi le filtre actuel.
-         *
-         * Exemple :
-         * Si on était dans ?type=panier,
-         * on revient à ?type=panier.
+         * On garde les filtres actuels :
+         * - type : all / panier / demande
+         * - etat : all / en_cours / termine / annule
          */
         return $this->redirectToRoute('app_vendeur_commandes', [
             'type' => $request->request->get('type', 'all'),
+            'etat' => $request->request->get('etat', 'all'),
         ]);
     }
 }

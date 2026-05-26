@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\VendeurRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VendeurRepository::class)]
@@ -45,7 +46,7 @@ class Vendeur
     #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'vendeur_username')]
     private Collection $reviews;
 
-    #[ORM\Column(name: 'created_at', options: ['default' => 'CURRENT_TIMESTAMP'])]
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeImmutable $created_at = null;
     public function __construct()
     {
