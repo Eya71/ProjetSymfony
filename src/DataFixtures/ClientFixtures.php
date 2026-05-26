@@ -25,7 +25,7 @@ class ClientFixtures extends Fixture
         $client2->setAdresse('Sfax route Menzel Chaker km 3.5');
         $client2->setNumTel('29204518');
         $client2->setIdPhoto('files_profil/eya.jpg');
-        $client2->setPwd('123456');
+        $client2->setPwd('eyaabbes01');
         $manager->persist($client2);
 
         $client3 = new Client();

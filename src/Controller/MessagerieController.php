@@ -29,19 +29,19 @@ final class MessagerieController extends AbstractController
         [$username, $role] = $this->currentUser();
 
         $sql = $role === 'client'
-            ? 'SELECT dr.id_deal, dr.client_username, dr.vendeur_username, dr.status, dr.prix_propose,
+            ? 'SELECT dr.id, dr.client_username, dr.vendeur_username, dr.status, dr.prix_propose,
                       d.nom_produit, d.id_photo,
-                      (SELECT MAX(created_at) FROM message m WHERE m.id_deal = dr.id_deal) AS last_msg_at,
-                      (SELECT contenu FROM message m WHERE m.id_deal = dr.id_deal ORDER BY id_message DESC LIMIT 1) AS last_msg,
-                      (SELECT COUNT(*) FROM message m WHERE m.id_deal = dr.id_deal AND m.receiver_username = :u AND m.is_read = 0) AS unread
+                      (SELECT MAX(created_at) FROM message m WHERE m.id = dr.id) AS last_msg_at,
+                      (SELECT contenu FROM message m WHERE m.id = dr.id ORDER BY id_message DESC LIMIT 1) AS last_msg,
+                      (SELECT COUNT(*) FROM message m WHERE m.id = dr.id AND m.receiver_username = :u AND m.is_read = 0) AS unread
                FROM deal_request dr
                JOIN demande d ON d.id_demande = dr.id_demande
                WHERE dr.client_username = :u
-               ORDER BY last_msg_at DESC, dr.id_deal DESC'
-            : 'SELECT dr.id_deal, dr.client_username, dr.vendeur_username, dr.status, dr.prix_propose,
+               ORDER BY last_msg_at DESC, dr.id DESC'
+            : 'SELECT dr.id, dr.client_username, dr.vendeur_username, dr.status, dr.prix_propose,
                       d.nom_produit, d.id_photo,
-                      (SELECT MAX(created_at) FROM message m WHERE m.id_deal = dr.id_deal) AS last_msg_at,
-                      (SELECT contenu FROM message m WHERE m.id_deal = dr.id_deal ORDER BY id_message DESC LIMIT 1) AS last_msg,
+                      (SELECT MAX(created_at) FROM message m WHERE m.id = dr.id) AS last_msg_at,
+                      (SELECT contenu FROM message m WHERE m.id = dr.id ORDER BY id_message DESC LIMIT 1) AS last_msg,
                       (SELECT COUNT(*) FROM message m WHERE m.id_deal = dr.id_deal AND m.receiver_username = :u AND m.is_read = 0) AS unread
                FROM deal_request dr
                JOIN demande d ON d.id_demande = dr.id_demande

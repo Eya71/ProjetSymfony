@@ -87,4 +87,55 @@ final class ClientInterfaceController extends AbstractController
 
         return $images;
     }
+    #[Route('/search-products', name: 'search_products')]
+    public function searchProducts(
+        Request $request,
+        ProduitRepository $produitRepository,
+        LegacyImagePathResolver $imagePathResolver
+    ): Response {
+
+        $query = $request->query->get('q');
+
+        if (!$query) {
+
+            return $this->json([]);
+        }
+
+        $produits = $produitRepository
+            ->createQueryBuilder('p')
+
+            ->where('p.nomProduit LIKE :q')
+
+            ->setParameter(
+                'q',
+                '%' . $query . '%'
+            )
+
+            ->setMaxResults(4)
+
+            ->getQuery()
+
+            ->getResult();
+
+        $results = [];
+
+        foreach ($produits as $produit) {
+
+            $results[] = [
+
+                'id' => $produit->getId(),
+
+                'nom' => $produit->getNomProduit(),
+
+                'prix' => $produit->getPrix(),
+
+                'image' => $imagePathResolver
+                    ->product(
+                        $produit->getImagePath()
+                    )
+            ];
+        }
+
+        return $this->json($results);
+    }
 }
