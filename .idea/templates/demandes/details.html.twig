@@ -1,0 +1,137 @@
+{% extends 'layouts/client_layout.html.twig' %}
+
+{% block title %}
+    Détails demande
+{% endblock %}
+
+{% block stylesheets %}
+
+    {{ parent() }}
+
+    <link rel="stylesheet"
+          href="{{ asset('css/details_demande.css') }}">
+
+{% endblock %}
+
+{% block page_title %}
+
+    Détails de la demande
+
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="page">
+
+        <a href="{{ path('mes_demandes') }}"
+           class="back-link">
+
+            ← Retour à mes demandes
+
+        </a>
+
+        <div class="box">
+
+            <img src="{{ asset(demande.imagePath) }}"
+                 alt="{{ demande.nomProduit }}">
+
+            <div class="etat-box">
+
+            <span class="detail-badge">
+
+                {{ demande.etat }}
+
+            </span>
+
+            </div>
+
+            <h2>
+
+                {{ demande.nomProduit }}
+
+            </h2>
+
+            <div class="detail-grid">
+
+                <p>
+
+                    <strong>Prix :</strong>
+
+                    {{ demande.prix }} TND
+
+                </p>
+
+                <p>
+
+                    <strong>Catégorie :</strong>
+
+                    {{ demande.categorie }}
+
+                </p>
+
+                <p>
+
+                    <strong>Date :</strong>
+
+                    {{ demande.createdAt|date('d/m/Y') }}
+
+                </p>
+
+                <p>
+
+                    <strong>Utilisateur :</strong>
+
+                    {{ demande.username }}
+
+                </p>
+
+            </div>
+
+            <div class="description-box">
+
+                <h3>Description</h3>
+
+                <p>
+
+                    {{ demande.description }}
+
+                </p>
+
+            </div>
+
+            <div class="detail-actions">
+
+                {% if demande.lienProduit %}
+
+                    <a href="{{ demande.lienProduit }}"
+                       target="_blank"
+                       class="action-btn">
+
+                        Voir le produit
+
+                    </a>
+
+                {% endif %}
+
+                <a href="#"
+                   class="btn-offres">
+
+                    Voir les offres
+
+                </a>
+
+                <a href="{{ path('demande_delete', {'id': demande.id}) }}"
+                   class="delete-btn"
+                   onclick="return confirm('Supprimer cette demande ?')">
+
+                    Supprimer
+
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endblock %}

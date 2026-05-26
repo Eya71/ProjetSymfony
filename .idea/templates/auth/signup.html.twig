@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign up - IMPORTY{% endblock %}
+{% block body_class %}login-body{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/style_login.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="login-container">
+        <h2>Sign up</h2>
+
+        <div id="errorAlert" class="alert-box" style="{{ error is not empty ? 'display:block' : 'display:none' }}">
+            <div class="alert-header">
+                <span class="alert-title">Erreur</span>
+                <span class="close-btn" onclick="closeError()">x</span>
+            </div>
+            <div class="alert-body" id="errorMessage">
+                {{ error }}
+            </div>
+        </div>
+
+        <form class="login-form" action="{{ path('app_signup') }}" method="post" id="registerForm" enctype="multipart/form-data">
+            <input
+                type="text"
+                name="username"
+                placeholder="Nom d'utilisateur"
+                value="{{ old.username|default('') }}"
+                required
+            >
+
+            <input type="password" name="password" id="password" placeholder="Mot de passe" required>
+
+            <input type="password" name="confirmPassword" id="confirmPassword" placeholder="Confirmer le mot de passe" required>
+
+            <input
+                type="tel"
+                name="tel"
+                placeholder="Numero de telephone"
+                value="{{ old.tel|default('') }}"
+            >
+
+            <input
+                type="email"
+                name="email"
+                placeholder="Email"
+                value="{{ old.email|default('') }}"
+            >
+
+            <input
+                type="text"
+                name="adresse"
+                placeholder="Adresse"
+                value="{{ old.adresse|default('') }}"
+            >
+
+            <div class="role">
+                <label>
+                    <input type="radio" name="role" value="client" {{ old.role|default('client') != 'vendeur' ? 'checked' : '' }}>
+                    <span>Client</span>
+                </label>
+
+                <label>
+                    <input type="radio" name="role" value="vendeur" {{ old.role|default('client') == 'vendeur' ? 'checked' : '' }}>
+                    <span>Vendeur</span>
+                </label>
+            </div>
+
+            <label class="upload">
+                Ajouter une photo
+                <input type="file" name="image" accept="image/*" capture="environment" id="photoInput" hidden>
+            </label>
+
+            <img id="preview" class="preview-img" alt="">
+
+            <button type="submit">Sign up</button>
+            <a href="{{ path('app_login') }}">Tu as deja un compte ?Se connecter</a>
+        </form>
+    </div>
+
+    <script src="{{ asset('js/login.js') }}"></script>
+    <script>
+        function closeError() {
+            document.getElementById('errorAlert').style.display = 'none';
+        }
+    </script>
+{% endblock %}

@@ -1,0 +1,155 @@
+{% extends 'partials/client_layout.html.twig' %}
+
+{% block page_title %}
+    Mes commandes
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="orders-page">
+
+        <div class="orders-header">
+
+            <h1>Mes commandes</h1>
+
+            <div class="orders-count">
+
+                {{ commandes|length }} commande(s)
+
+            </div>
+
+        </div>
+
+        {% if commandes is not empty %}
+
+            <div class="orders-stack">
+
+                {% for commande in commandes %}
+
+                    <div class="client-order-card">
+
+                        <div class="client-order-head">
+
+                            <div>
+
+                                <h3>
+
+                                    Commande #{{ commande.id }}
+
+                                </h3>
+
+                                <div class="client-order-meta">
+
+                                <span>
+
+                                    Vendeur :
+                                    {{ commande.vendeur.username }}
+
+                                </span>
+
+                                    <span>
+
+                                    {{ commande.createdAt|date('d/m/Y H:i') }}
+
+                                </span>
+
+                                    <span class="status">
+
+                                    {{ commande.statut }}
+
+                                </span>
+
+                                </div>
+
+                            </div>
+
+                            <div class="client-order-total">
+
+                                {{ commande.total }} DT
+
+                            </div>
+
+                        </div>
+
+                        <div class="client-order-items">
+
+                            {% for item in commande.commandeItems %}
+
+                                <div class="client-order-item">
+
+                                    <img
+                                            src="{{ asset(item.imagePath) }}"
+                                            alt="{{ item.nomProduit }}"
+                                    >
+
+                                    <h4>
+
+                                        {{ item.nomProduit }}
+
+                                    </h4>
+
+                                    <p>
+
+                                        Prix :
+                                        {{ item.prixUnitaire }} DT
+
+                                    </p>
+
+                                    <p>
+
+                                        Quantité :
+                                        {{ item.quantite }}
+
+                                    </p>
+
+                                    <p>
+
+                                        Sous-total :
+                                        {{ item.sousTotal }} DT
+
+                                    </p>
+
+                                </div>
+
+                            {% endfor %}
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="orders-empty">
+
+                <h3>
+
+                    Aucune commande
+
+                </h3>
+
+                <p>
+
+                    Vous n'avez encore aucune commande.
+
+                </p>
+
+                <a href="{{ path('app_client_interface') }}"
+                   class="explore-btn">
+
+                    <i class="fa-solid fa-bag-shopping"></i>
+
+                    Explorer les produits
+
+                </a>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}

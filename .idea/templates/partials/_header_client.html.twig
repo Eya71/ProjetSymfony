@@ -1,0 +1,157 @@
+<div class="top-banner">
+
+    <div class="banner-track">
+        <span>livraison sur toute la <strong>Tunisie</strong>• </span>
+        <span>Chez nous, poster vos demandes et cherchez la meilleure offre pour vous</span>
+        <span>livraison sur toute la <strong>Tunisie</strong> •</span>
+        <span>Chez nous, poster vos demandes et cherchez la meilleure offre pour vous</span>
+        <span>livraison sur toute la <strong>Tunisie</strong> •</span>
+        <span>Chez nous, poster vos demandes et cherchez la meilleure offre pour vous</span>
+    </div>
+
+</div>
+
+<header class="top-header simple-client-header">
+
+    <button id="menuBtn"
+            class="menu-btn"
+            type="button">
+
+        <i class="fa-solid fa-align-justify"></i>
+
+    </button>
+
+    <a class="logo"
+       href="{{ path('app_client_interface') }}">
+
+        <img class="logo-img"
+             src="{{ asset('files_profil/logo.png') }}"
+             alt="Importy">
+
+    </a>
+    <a href="{{ path('app_client_interface') }}"
+       class="back-client-btn">
+
+        ← Retour interface client
+
+    </a>
+    {% if app.user %}
+
+        <div class="icons quick-actions">
+
+            <a href="{{ path('app_client_profile') }}"
+               class="icon-item">
+
+                <i class="fa-regular fa-user"
+                   style="color:#B197FC;"></i>
+
+                <span>
+
+                Mon compte
+
+            </span>
+
+            </a>
+
+            <a href="{{ path('panier_index') }}"
+               class="icon-item">
+
+                <i class="fa-solid fa-bag-shopping"
+                   style="color:#B197FC;"></i>
+
+                <span>
+
+                Panier
+
+            </span>
+
+            </a>
+
+            <a href="{{ path('demande_index') }}"
+               class="icon-item">
+
+                <i class="fa-solid fa-plus"
+                   style="color:#74C0FC;"></i>
+
+                <span>
+
+                Demande
+
+            </span>
+
+            </a>
+
+            <a href="{{ path('mes_demandes') }}"
+               class="icon-item">
+
+                <i class="fa-solid fa-list-check"
+                   style="color:#74C0FC;"></i>
+
+                <span>
+
+                Mes demandes
+
+            </span>
+
+            </a>
+
+            <a href="{{ path('app_notifications_index') }}"
+               class="icon-item">
+
+                <i class="fa-solid fa-bell"
+                   style="color:#74C0FC;"></i>
+
+                <span>
+
+                Notification
+
+            </span>
+
+                <span class="badge {{ (notifCount is not defined or notifCount == 0) ? 'badge-hidden' : '' }}"
+                      data-notif-badge
+                      {{ (notifCount is not defined or notifCount == 0) ? 'style="display:none"' : '' }}>{{ notifCount|default(0) }}</span>
+
+            </a>
+
+            <a href="{{ path('app_messagerie_index') }}"
+               class="icon-item">
+
+                <i class="fa-solid fa-envelope"
+                   style="color:#B197FC;"></i>
+
+                <span>
+
+                Messages
+
+            </span>
+
+                <span class="badge {{ (messageCount is not defined or messageCount == 0) ? 'badge-hidden' : '' }}"
+                      data-message-badge
+                      {{ (messageCount is not defined or messageCount == 0) ? 'style="display:none"' : '' }}>{{ messageCount|default(0) }}</span>
+
+            </a>
+
+        </div>
+
+    {% else %}
+
+        <div class="icons quick-actions">
+
+            <a href="{{ path('app_login') }}"
+               class="icon-item">
+
+                <i class="fa-regular fa-user"></i>
+
+                <span>
+
+                Se connecter
+
+            </span>
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</header>

@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}IMPORTY : Accueil{% endblock %}
+
+{% block body %}
+    <div class="cart-toast" id="cartToast">Produit ajoute dans le panier.</div>
+    <div class="top-banner">
+        <div class="banner-track">
+            <span>livraison sur toute la <strong>Tunisie</strong> • </span>
+            <span>Chez nous,poster votre demandes et chercher la meilleure offre pour vous</span>
+            <span>livraison sur toute la <strong>Tunisie</strong> •</span>
+            <span>Chez nous,poster votre demandes et chercher la meilleure offre pour vous</span>
+            <span>livraison sur toute la <strong>Tunisie</strong> •</span>
+            <span>Chez nous,poster votre demandes et chercher la meilleure offre pour vous</span>
+        </div>
+    </div>
+
+    <header class="top-header">
+        <button id="menuBtn" class="menu-btn">
+            <i class="fa-solid fa-align-justify"></i>
+        </button>
+
+        <a class="logo" aria-label="Importy - Accueil">
+            <img class="logo-img" src="{{ asset('files_profil/logo.png') }}" alt="Importy">
+        </a>
+
+        <div class="search">
+            <i class="fa fa-search"></i>
+            <input type="text" id="homeProductSearch" placeholder="Rechercher un produit, une marque...">
+        </div>
+
+        <div class="icons">
+            <a href="{{ app.user ? path('panier_index') : '#' }}" class="icon-item" {% if not app.user %}id="sidebarPanierTrigger"{% endif %}>
+                <i class="fa-solid fa-bag-shopping" style="color:#B197FC;"></i>
+                <span>Votre Panier</span>
+            </a>
+
+            <a href="{{ path('app_login') }}" class="icon-item">
+                <i class="fa-regular fa-user" style="color:#74C0FC;"></i>
+                <span>Se connecter</span>
+            </a>
+        </div>
+    </header>
+
+    <div class="hero">
+        <img src="{{ asset('files_profil/img.png') }}" alt="promo" class="hero-img">
+    </div>
+
+    <div class="side-menu" id="sideMenu">
+        <div class="side-header">
+            <a class="brand" aria-label="Importy - Accueil">
+                <img class="brand-img" src="{{ asset('files_profil/logo.png') }}" alt="Importy">
+            </a>
+            <i class="fa-solid fa-xmark" id="closeMenu" onclick="window.importySidebarClose && window.importySidebarClose()"></i>
+        </div>
+
+        <div class="section">
+            <h4>Compte</h4>
+            <a href="{{ path('app_login') }}"><i class="fa-regular fa-user"></i> Login</a>
+        </div>
+    </div>
+
+    <main class="client-page simple-client-page">
+        <section class="client-content full-width-content">
+            <section class="content-card" id="produits">
+                <div class="section-head">
+                    <h2>Produits</h2>
+                    <p>{{ produits|length }} resultat(s)</p>
+                </div>
+
+                <div class="products-grid" id="productsGrid">
+                    {% if produits is not empty %}
+                        {% for prod in produits %}
+                            <article class="product-card searchable-product">
+                                <span class="product-badge">{{ prod.categorie|default('Sans categorie') }}</span>
+                                <div class="product-image">
+                                    <img src="{{ asset(productImages[prod.id]|default('files_profil/logo.png')) }}" alt="{{ prod.nomProduit|default('Produit') }}">
+                                </div>
+                                <h3>{{ prod.nomProduit|default('Produit') }}</h3>
+                                <p><strong>Prix : </strong>{{ prod.prix|default('0') }} DT</p>
+
+                                <div class="product-actions">
+                                    <a class="small-btn" href="{{ path('produit_details', {'id': prod.id}) }}">Voir produit</a>
+                                    {% if app.user %}
+                                        <form action="{{ path('panier_add') }}" method="post" class="add-to-cart-form">
+                                            <input type="hidden" name="id_produit" value="{{ prod.id|default(0) }}">
+                                            <input type="hidden" name="redirect_to" value="{{ path('app_home') }}">
+                                            <button class="primary-btn product-cart-btn" type="submit">Ajouter au panier</button>
+                                        </form>
+                                    {% else %}
+                                        <button class="primary-btn product-cart-btn open-index-sidebar" type="button">Ajouter au panier</button>
+                                    {% endif %}
+                                </div>
+                            </article>
+                        {% endfor %}
+                    {% else %}
+                        <p class="empty-products">Aucun produit trouve dans la base de donnees.</p>
+                    {% endif %}
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <a href="{{ app.user ? path('panier_index') : '#' }}" class="floating-cart-btn" {% if not app.user %}id="floatingSidebarPanierTrigger"{% endif %} aria-label="Voir le panier">
+        <i class="fa-solid fa-bag-shopping"></i>
+    </a>
+
+    {% include 'partials/_home_script.html.twig' %}
+    {% include 'partials/_footer.html.twig' %}
+{% endblock %}

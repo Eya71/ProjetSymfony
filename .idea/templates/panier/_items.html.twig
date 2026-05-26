@@ -1,0 +1,56 @@
+{% if items is not empty %}
+    <div class="panier-list">
+        {% for item in items %}
+            <article class="panier-item">
+                <div class="panier-image">
+                    <img src="{{ asset(item.resolved_image) }}" alt="">
+                </div>
+
+                <div class="panier-content">
+                    <span class="product-badge">{{ item.categorie }}</span>
+
+                    <h3>{{ item.nom_produit }}</h3>
+
+                    <p>{{ item.description }}</p>
+
+                    <strong class="price">{{ item.prix }} DT</strong>
+
+                    <p>
+                        <strong>Sous-total :</strong>
+                        {{ item.subtotal|number_format(2, '.', ' ') }} DT
+                    </p>
+
+                    <p>
+                        <strong>Stock disponible :</strong>
+                        {{ item.stock|default(0) < 0 ? 0 : item.stock|default(0) }}
+                    </p>
+
+                    <div class="panier-controls">
+                        <form action="{{ path('panier_update') }}" method="post">
+                            <input type="hidden" name="action" value="update">
+                            <input type="hidden" name="id_panier" value="{{ item.id_panier }}">
+
+                            <input
+                                type="number"
+                                name="quantite"
+                                value="{{ item.quantite }}"
+                                min="1"
+                                {% if item.stock|default(0) > 0 %}max="{{ item.stock }}"{% else %}disabled{% endif %}>
+
+                            <button class="secondary-btn" {% if item.stock|default(0) <= 0 %}disabled{% endif %}>Modifier</button>
+                        </form>
+
+                        <form action="{{ path('panier_update') }}" method="post">
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="id_panier" value="{{ item.id_panier }}">
+
+                            <button class="delete-btn">Supprimer</button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        {% endfor %}
+    </div>
+{% else %}
+    <p>Votre panier est vide.</p>
+{% endif %}
