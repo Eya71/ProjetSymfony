@@ -11,7 +11,7 @@ class Produit
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(name: 'id_produit')]
+    #[ORM\Column]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'produits')]
