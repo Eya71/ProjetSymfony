@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
+use App\Repository\ProduitRepository;
 use App\Service\LegacyImagePathResolver;
-use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -11,16 +11,23 @@ use Symfony\Component\Routing\Attribute\Route;
 final class IndexController extends AbstractController
 {
     #[Route('/', name: 'app_home')]
-    public function index(Connection $connection, LegacyImagePathResolver $imagePathResolver): Response
+    public function index(ProduitRepository $produitRepository, LegacyImagePathResolver $imagePathResolver): Response
     {
-        $produits = $connection->fetchAllAssociative('SELECT * FROM produit ORDER BY id_produit DESC LIMIT 12');
-        foreach ($produits as &$produit) {
-            $produit['resolved_image'] = $imagePathResolver->product($produit['image_path'] ?? '');
-        }
-        unset($produit);
+        $produits = $produitRepository->findLatestWithVendeur();
 
         return $this->render('index.html.twig', [
             'produits' => $produits,
+            'productImages' => $this->resolveProductImages($produits, $imagePathResolver),
         ]);
+    }
+
+    private function resolveProductImages(array $produits, LegacyImagePathResolver $imagePathResolver): array
+    {
+        $images = [];
+        foreach ($produits as $produit) {
+            $images[$produit->getId()] = $imagePathResolver->product($produit->getImagePath());
+        }
+
+        return $images;
     }
 }

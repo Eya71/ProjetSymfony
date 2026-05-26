@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Repository\ClientRepository;
+use App\Security\LegacyUser;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -18,15 +19,12 @@ final class ClientProfileController extends AbstractController
         ClientRepository $clientRepository,
         EntityManagerInterface $entityManager
     ): Response {
-        $session = $request->getSession();
-
-        $userSession = $session->get('user');
-
-        if (!$userSession || empty($userSession['username'])) {
+        $user = $this->getUser();
+        if (!$user instanceof LegacyUser || $user->getLegacyRole() !== 'client') {
             return $this->redirectToRoute('app_login');
         }
 
-        $username = $userSession['username'];
+        $username = $user->getUsername();
 
         $client = $clientRepository->findOneBy([
             'username' => $username,

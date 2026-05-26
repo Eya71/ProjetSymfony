@@ -27,7 +27,7 @@ class Vendeur
     #[ORM\Column(length: 20)]
     private ?string $numTel = null;
 
-    #[ORM\Column(length: 200)]
+    #[ORM\Column(name: 'id_photo', length: 200)]
     private ?string $idPhoto = null;
 
     #[ORM\Column(length: 100)]
@@ -36,7 +36,7 @@ class Vendeur
     /**
      * @var Collection<int, Produit>
      */
-    #[ORM\OneToMany(targetEntity: Produit::class, mappedBy: 'vendeur_username')]
+    #[ORM\OneToMany(targetEntity: Produit::class, mappedBy: 'vendeurUsername')]
     private Collection $produits;
 
     /**
@@ -45,7 +45,7 @@ class Vendeur
     #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'vendeur_username')]
     private Collection $reviews;
 
-    #[ORM\Column]
+    #[ORM\Column(name: 'created_at', options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeImmutable $created_at = null;
     public function __construct()
     {

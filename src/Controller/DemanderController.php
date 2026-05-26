@@ -2,140 +2,75 @@
 
 namespace App\Controller;
 
+use App\Security\LegacyUser;
+use App\Service\NotificationService;
+use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\HttpFoundation\Request;
-use Doctrine\ORM\EntityManagerInterface;
-
 
 final class DemanderController extends AbstractController
 {
     #[Route('/demande', name: 'demande_index')]
     public function index(): Response
     {
-
-
-        return $this->render(
-            'demandes/create.html.twig'
-        );
-
+        return $this->render('demandes/create.html.twig');
     }
+
     #[Route('/demande/store', name: 'demande_store', methods: ['POST'])]
     public function store(
         Request $request,
-        EntityManagerInterface $entityManager
+        Connection $connection,
+        NotificationService $notif
     ): Response {
-
-        $nomProduit =
-            $request->request->get('nom_produit');
-
-        $prix =
-            $request->request->get('prix');
-
-        $categorie =
-            $request->request->get('categorie');
-
-        $description =
-            $request->request->get('description');
-
-        $lienProduit =
-            $request->request->get('lien_produit');
-        $image =
-            $request->files->get('image');
-
-        $imagePath = null;
-        if (!$image) {
-
-            $this->addFlash(
-                'error',
-                'Image obligatoire'
-            );
-
-            return $this->redirectToRoute(
-                'demande_index'
-            );
-
-        }
-        if ($image) {
-
-            $newFilename =
-                uniqid()
-                . '.'
-                . $image->guessExtension();
-
-            try {
-
-                $image->move(
-                    $this->getParameter(
-                        'kernel.project_dir'
-                    ) . '/public/files_demandes',
-                    $newFilename
-                );
-
-                $imagePath =
-                    'files_demandes/' . $newFilename;
-
-            } catch (FileException $e) {
-
-                $this->addFlash(
-                    'error',
-                    'Erreur upload image'
-                );
-
-                return $this->redirectToRoute(
-                    'demande_index'
-                );
-
-            }
-
+        $user = $this->getUser();
+        if (!$user instanceof LegacyUser || $user->getLegacyRole() !== 'client') {
+            return $this->redirectToRoute('app_login');
         }
 
+        $nomProduit = trim((string) $request->request->get('nom_produit', ''));
+        $prix = (string) $request->request->get('prix', '');
+        $categorie = trim((string) $request->request->get('categorie', ''));
+        $description = trim((string) $request->request->get('description', ''));
+        $lienProduit = trim((string) $request->request->get('lien_produit', ''));
+        $image = $request->files->get('image');
 
-        $demande = new Demande();
+        if ($nomProduit === '' || $prix === '' || $categorie === '' || !$image) {
+            $this->addFlash('error', 'Veuillez remplir tous les champs et joindre une image.');
+            return $this->redirectToRoute('demande_index');
+        }
 
-        $demande->setUsername(
-            $this->getUser()->getUserIdentifier()
-        );
+        $newFilename = uniqid().'.'.$image->guessExtension();
+        try {
+            $image->move(
+                $this->getParameter('kernel.project_dir').'/public/files_demandes',
+                $newFilename
+            );
+        } catch (FileException) {
+            $this->addFlash('error', 'Erreur lors du téléversement de l\'image.');
+            return $this->redirectToRoute('demande_index');
+        }
+        $imagePath = 'files_demandes/'.$newFilename;
 
-        $demande->setNomProduit(
-            $nomProduit
-        );
+        $connection->insert('demande', [
+            'nom_produit' => $nomProduit,
+            'prix' => $prix,
+            'lien_produit' => $lienProduit,
+            'description' => $description,
+            'categorie' => $categorie,
+            'id_photo' => $imagePath,
+            'username' => $user->getUsername(),
+            'etat' => 'en attente',
+            'created_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
+            'source' => 'demande',
+        ]);
+        $demandeId = (int) $connection->lastInsertId();
 
-        $demande->setPrix(
-            (float)$prix
-        );
+        $notif->notifyNewDemande($demandeId, $user->getUsername(), $nomProduit, $prix);
 
-        $demande->setCategorie(
-            $categorie
-        );
-
-        $demande->setDescription(
-            $description
-        );
-
-        $demande->setLienProduit(
-            $lienProduit
-        );
-
-        $demande->setImagePath(
-            $imagePath
-        );
-
-        $entityManager->persist($demande);
-
-        $entityManager->flush();
-
-
-        $this->addFlash(
-            'success',
-            'Demande publiée'
-        );
-
-        return $this->redirectToRoute(
-            'demande_index'
-        );
-
+        $this->addFlash('success', 'Demande publiée avec succès.');
+        return $this->redirectToRoute('demande_index');
     }
-
 }

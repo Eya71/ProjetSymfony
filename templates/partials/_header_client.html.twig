@@ -99,7 +99,7 @@
 
             </a>
 
-            <a href="{{ path('demande_index') }}"
+            <a href="{{ path('app_notifications_index') }}"
                class="icon-item">
 
                 <i class="fa-solid fa-bell"
@@ -111,19 +111,13 @@
 
             </span>
 
-                {% if notifCount is defined and notifCount > 0 %}
-
-                    <span class="badge">
-
-                    {{ notifCount }}
-
-                </span>
-
-                {% endif %}
+                <span class="badge {{ (notifCount is not defined or notifCount == 0) ? 'badge-hidden' : '' }}"
+                      data-notif-badge
+                      {{ (notifCount is not defined or notifCount == 0) ? 'style="display:none"' : '' }}>{{ notifCount|default(0) }}</span>
 
             </a>
 
-            <a href="{{ path('demande_index') }}"
+            <a href="{{ path('app_messagerie_index') }}"
                class="icon-item">
 
                 <i class="fa-solid fa-envelope"
@@ -135,15 +129,9 @@
 
             </span>
 
-                {% if messageCount is defined and messageCount > 0 %}
-
-                    <span class="badge">
-
-                    {{ messageCount }}
-
-                </span>
-
-                {% endif %}
+                <span class="badge {{ (messageCount is not defined or messageCount == 0) ? 'badge-hidden' : '' }}"
+                      data-message-badge
+                      {{ (messageCount is not defined or messageCount == 0) ? 'style="display:none"' : '' }}>{{ messageCount|default(0) }}</span>
 
             </a>
 

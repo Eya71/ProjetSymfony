@@ -53,7 +53,7 @@ final class PanierController extends AbstractController
             return $this->panierResponse($request, $isAjax, false, 'Produit invalide.', $redirectTo);
         }
 
-        $product = $connection->fetchAssociative('SELECT quantite FROM produit WHERE id_produit = :id_produit', [
+        $product = $connection->fetchAssociative('SELECT quantite FROM produit WHERE id = :id_produit', [
             'id_produit' => $idProduit,
         ]);
 
@@ -62,7 +62,7 @@ final class PanierController extends AbstractController
         }
 
         $existingItem = $connection->fetchAssociative(
-            'SELECT id_panier, quantite FROM panier WHERE username = :username AND id_produit = :id_produit',
+            'SELECT id AS id_panier, quantite FROM panier WHERE username = :username AND id_produit = :id_produit',
             ['username' => $user->getUsername(), 'id_produit' => $idProduit]
         );
 
@@ -72,12 +72,13 @@ final class PanierController extends AbstractController
                 return $this->panierResponse($request, $isAjax, false, 'Quantite demandee superieure au stock disponible.', $redirectTo);
             }
 
-            $connection->update('panier', ['quantite' => $newQuantite], ['id_panier' => $existingItem['id_panier']]);
+            $connection->update('panier', ['quantite' => $newQuantite], ['id' => $existingItem['id_panier']]);
         } else {
             $connection->insert('panier', [
                 'username' => $user->getUsername(),
                 'id_produit' => $idProduit,
                 'quantite' => 1,
+                'date_ajout' => (new \DateTimeImmutable())->format('H:i:s'),
             ]);
         }
 
@@ -104,7 +105,7 @@ final class PanierController extends AbstractController
 
         if ($action === 'delete') {
             $connection->delete('panier', [
-                'id_panier' => $idPanier,
+                'id' => $idPanier,
                 'username' => $user->getUsername(),
             ]);
 
@@ -123,7 +124,7 @@ final class PanierController extends AbstractController
         }
 
         $stockInfo = $connection->fetchAssociative(
-            'SELECT pr.quantite AS stock FROM panier p INNER JOIN produit pr ON pr.id_produit = p.id_produit WHERE p.id_panier = :id_panier AND p.username = :username',
+            'SELECT pr.quantite AS stock FROM panier p INNER JOIN produit pr ON pr.id = p.id_produit WHERE p.id = :id_panier AND p.username = :username',
             ['id_panier' => $idPanier, 'username' => $user->getUsername()]
         );
 
@@ -138,7 +139,7 @@ final class PanierController extends AbstractController
         }
 
         $connection->update('panier', ['quantite' => $quantite], [
-            'id_panier' => $idPanier,
+            'id' => $idPanier,
             'username' => $user->getUsername(),
         ]);
 
@@ -165,9 +166,10 @@ final class PanierController extends AbstractController
 
         $username = $user->getUsername();
         $items = $connection->fetchAllAssociative(
-            'SELECT p.id_panier, p.quantite, pr.id_produit, pr.nom_produit, pr.prix, pr.description, pr.categorie, pr.image_path, pr.vendeur_username, pr.quantite AS stock
+            'SELECT p.id AS id_panier, p.quantite, pr.id AS id_produit, pr.nom_produit, pr.prix, pr.decription AS description, pr.categorie, pr.image_path, v.username AS vendeur_username, pr.quantite AS stock
              FROM panier p
-             INNER JOIN produit pr ON pr.id_produit = p.id_produit
+             INNER JOIN produit pr ON pr.id = p.id_produit
+             LEFT JOIN vendeur v ON v.id = pr.vendeur_username_id
              WHERE p.username = :username',
             ['username' => $username]
         );
@@ -187,7 +189,7 @@ final class PanierController extends AbstractController
                 }
 
                 $updated = $connection->executeStatement(
-                    'UPDATE produit SET quantite = quantite - :quantite WHERE id_produit = :id_produit AND quantite >= :quantite',
+                    'UPDATE produit SET quantite = quantite - :quantite WHERE id = :id_produit AND quantite >= :quantite',
                     ['quantite' => (int) $item['quantite'], 'id_produit' => (int) $item['id_produit']]
                 );
 
@@ -217,24 +219,29 @@ final class PanierController extends AbstractController
             foreach ($commandesParVendeur as $commandeData) {
                 $firstItem = $commandeData['items'][0];
                 $lines = array_map(fn (array $orderItem): string => $orderItem['nom_produit'].' x'.$orderItem['quantite'], $commandeData['items']);
+                $clientId = $connection->fetchOne('SELECT id FROM client WHERE username = :username', ['username' => $username]);
+                $vendeurId = $connection->fetchOne('SELECT id FROM vendeur WHERE username = :username', ['username' => $commandeData['vendeur']]);
+
+                if (!$clientId || !$vendeurId) {
+                    throw new \RuntimeException('Client ou vendeur introuvable pour la commande panier.');
+                }
 
                 $connection->insert('demande', [
                     'nom_produit' => 'Commande panier - '.$commandeData['vendeur'],
                     'prix' => $commandeData['total'],
                     'lien_produit' => '',
-                    'description' => 'Commande creee depuis le panier : '.implode(', ', $lines),
+                    'descrption' => 'Commande creee depuis le panier : '.implode(', ', $lines),
                     'categorie' => $firstItem['categorie'] !== '' ? $firstItem['categorie'] : 'tous',
                     'id_photo' => $firstItem['image_path'],
-                    'username' => $username,
+                    'username_id' => (int) $clientId,
                     'etat' => 'en attente',
-                    'source' => 'panier',
                 ]);
 
                 $idDemande = (int) $connection->lastInsertId();
-                $connection->insert('commandes', [
-                    'id_demande' => $idDemande,
-                    'vendeur' => $commandeData['vendeur'],
-                    'client' => $username,
+                $connection->insert('commande', [
+                    'id_demande_id' => $idDemande,
+                    'vendeur_id' => (int) $vendeurId,
+                    'client_id' => (int) $clientId,
                     'statut' => 'en cours',
                     'source' => 'panier',
                     'total' => $commandeData['total'],
@@ -243,9 +250,8 @@ final class PanierController extends AbstractController
                 $idCommande = (int) $connection->lastInsertId();
                 foreach ($commandeData['items'] as $orderItem) {
                     $connection->insert('commande_item', [
-                        'id_commande' => $idCommande,
-                        'id_produit' => $orderItem['id_produit'],
-                        'nom_produit' => $orderItem['nom_produit'],
+                        'id_commande_id' => $idCommande,
+                        'id_produit_id' => $orderItem['id_produit'],
                         'prix_unitaire' => $orderItem['prix_unitaire'],
                         'quantite' => $orderItem['quantite'],
                         'sous_total' => $orderItem['sous_total'],
@@ -291,9 +297,9 @@ final class PanierController extends AbstractController
     private function fetchItems(Connection $connection, LegacyImagePathResolver $imagePathResolver, string $username): array
     {
         $items = $connection->fetchAllAssociative(
-            'SELECT p.id_panier, p.quantite, p.date_ajout, pr.id_produit, pr.nom_produit, pr.prix, pr.description, pr.categorie, pr.image_path, pr.quantite AS stock
+            'SELECT p.id AS id_panier, p.quantite, p.date_ajout, pr.id AS id_produit, pr.nom_produit, pr.prix, pr.decription AS description, pr.categorie, pr.image_path, pr.quantite AS stock
              FROM panier p
-             INNER JOIN produit pr ON pr.id_produit = p.id_produit
+             INNER JOIN produit pr ON pr.id = p.id_produit
              WHERE p.username = :username
              ORDER BY p.date_ajout DESC',
             ['username' => $username]
@@ -316,7 +322,7 @@ final class PanierController extends AbstractController
     private function ordersCount(Connection $connection, string $username): int
     {
         try {
-            return (int) $connection->fetchOne("SELECT COUNT(*) FROM commandes WHERE client = :client AND source = 'panier'", [
+            return (int) $connection->fetchOne("SELECT COUNT(*) FROM commande co INNER JOIN client c ON c.id = co.client_id WHERE c.username = :client AND co.source = 'panier'", [
                 'client' => $username,
             ]);
         } catch (\Throwable) {

@@ -15,7 +15,7 @@ class Produit
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'produits')]
-    #[ORM\JoinColumn(name: 'vendeur_username', referencedColumnName: 'username')]
+    #[ORM\JoinColumn(name: 'vendeur_username_id', referencedColumnName: 'id')]
     private ?Vendeur $vendeurUsername = null;
 
     #[ORM\Column(name: 'nom_produit', length: 255)]
@@ -30,14 +30,11 @@ class Produit
     #[ORM\Column(length: 255)]
     private ?string $categorie = null;
 
-    #[ORM\Column(name: 'description', length: 255)]
+    #[ORM\Column(name: 'decription', length: 255)]
     private ?string $description = null;
 
     #[ORM\Column(name: 'image_path', length: 255)]
     private ?string $imagePath = null;
-
-    #[ORM\Column(name: 'created_at', nullable: true)]
-    private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
     {
@@ -128,15 +125,4 @@ class Produit
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(?\DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
 }
