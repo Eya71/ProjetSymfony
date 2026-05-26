@@ -95,8 +95,8 @@ final class AuthController extends AbstractController
                     'email' => $old['email'],
                     'adresse' => $old['adresse'],
                     'num_tel' => $old['tel'],
-                    'idphoto' => $storedPhotoPath,
-                    'password' => $passwordHasher->hashPassword($user, $password),
+                    'id_photo' => $storedPhotoPath,
+                    'pwd' => $passwordHasher->hashPassword($user, $password),
                 ]);
 
                 return $this->redirectToRoute($old['role'] === 'client' ? 'app_login' : 'app_home');

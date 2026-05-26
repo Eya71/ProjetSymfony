@@ -25,7 +25,7 @@ final class LegacyUserProvider implements UserProviderInterface
 
         $table = $role === 'vendeur' ? 'vendeur' : 'client';
         $user = $this->connection->fetchAssociative(
-            "SELECT username, email, adresse, num_tel, idphoto, password FROM {$table} WHERE username = :username",
+            "SELECT username, email, adresse, num_tel, id_photo, pwd AS password FROM {$table} WHERE username = :username",
             ['username' => $username]
         );
 

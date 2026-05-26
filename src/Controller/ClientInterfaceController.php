@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
+use App\Repository\ClientRepository;
+use App\Repository\DealRequestRepository;
+use App\Repository\MessageRepository;
+use App\Repository\ProduitRepository;
 use App\Security\LegacyUser;
 use App\Service\LegacyImagePathResolver;
-use Doctrine\DBAL\Connection;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -12,47 +15,49 @@ use Symfony\Component\Routing\Attribute\Route;
 final class ClientInterfaceController extends AbstractController
 {
     #[Route('/client-interface', name: 'app_client_interface')]
-    public function index(Connection $connection, LegacyImagePathResolver $imagePathResolver): Response
-    {
+    public function index(
+        ClientRepository $clientRepository,
+        DealRequestRepository $dealRequestRepository,
+        MessageRepository $messageRepository,
+        ProduitRepository $produitRepository,
+        LegacyImagePathResolver $imagePathResolver,
+    ): Response {
         $this->denyAccessUnlessGranted('ROLE_CLIENT');
 
         $user = $this->getUser();
         $username = $user instanceof LegacyUser ? $user->getUsername() : '';
-        $userInfo = $connection->fetchAssociative('SELECT idphoto FROM client WHERE username = :username', [
-            'username' => $username,
-        ]) ?: [];
+        $client = $clientRepository->findOneBy(['username' => $username]);
 
         $notifCount = 0;
         $messageCount = 0;
 
-        try {
-            $notifCount = (int) $connection->fetchOne(
-                'SELECT COUNT(*) FROM deal_request WHERE client_username = :username AND (client_seen_at IS NULL OR created_at > client_seen_at)',
-                ['username' => $username]
-            );
-        } catch (\Throwable) {
+        if ($client !== null) {
+            $notifCount = $dealRequestRepository->countUnseenForClient($client);
         }
 
-        try {
-            $messageCount = (int) $connection->fetchOne(
-                'SELECT COUNT(*) FROM message WHERE receiver_username = :username AND is_read = 0',
-                ['username' => $username]
-            );
-        } catch (\Throwable) {
+        if ($username !== '') {
+            $messageCount = $messageRepository->countUnreadForReceiver($username);
         }
 
-        $produits = $connection->fetchAllAssociative('SELECT * FROM produit ORDER BY id_produit DESC LIMIT 12');
-        foreach ($produits as &$produit) {
-            $produit['resolved_image'] = $imagePathResolver->product($produit['image_path'] ?? '');
-        }
-        unset($produit);
+        $produits = $produitRepository->findLatestWithVendeur();
 
         return $this->render('client/index.html.twig', [
             'username' => $username,
-            'photoUrl' => $imagePathResolver->profile($userInfo['idphoto'] ?? ''),
+            'photoUrl' => $imagePathResolver->profile($client?->getIdPhoto()),
             'notifCount' => $notifCount,
             'messageCount' => $messageCount,
             'produits' => $produits,
+            'productImages' => $this->resolveProductImages($produits, $imagePathResolver),
         ]);
+    }
+
+    private function resolveProductImages(array $produits, LegacyImagePathResolver $imagePathResolver): array
+    {
+        $images = [];
+        foreach ($produits as $produit) {
+            $images[$produit->getId()] = $imagePathResolver->product($produit->getImagePath());
+        }
+
+        return $images;
     }
 }

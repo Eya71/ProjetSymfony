@@ -7,23 +7,18 @@
     <title>{% block title %}Welcome!{% endblock %}</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     {% block stylesheets %}
-        <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=sidebar-fix-3">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}?v=no-overlay-1">
     {% endblock %}
     <style>
         .overlay {
-            pointer-events: none !important;
-        }
-        body:not(.sidebar-open) .overlay {
             display: none !important;
             opacity: 0 !important;
             visibility: hidden !important;
+            pointer-events: none !important;
+            background: transparent !important;
+            z-index: -1 !important;
         }
-        body.sidebar-open .overlay {
-            display: block !important;
-            opacity: 1 !important;
-            visibility: visible !important;
-        }
-        body.sidebar-open .side-menu {
+        body.sidebar-open .side-menu.active {
             left: 0 !important;
             z-index: 2001 !important;
         }
