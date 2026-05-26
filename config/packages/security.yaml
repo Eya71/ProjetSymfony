@@ -28,6 +28,11 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/client-interface, roles: ROLE_CLIENT }
+        - { path: ^/messagerie, roles: [ROLE_CLIENT, ROLE_VENDEUR] }
+        - { path: ^/notifications, roles: [ROLE_CLIENT, ROLE_VENDEUR] }
+        - { path: ^/demande/store, roles: ROLE_CLIENT }
+        - { path: ^/produit/add, roles: ROLE_VENDEUR }
+        - { path: ^/produit/store, roles: ROLE_VENDEUR }
         # - { path: ^/admin, roles: ROLE_ADMIN }
         # - { path: ^/profile, roles: ROLE_USER }
 
