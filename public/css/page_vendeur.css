@@ -437,6 +437,7 @@
   border: 1px solid rgba(0, 0, 0, 0.12);
   border-radius: 14px;
   background: #fff;
+  gap: 15px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -466,6 +467,12 @@
 
 .vendeur-main button[type="submit"]:hover {
   transform: translateY(-1px);
+}
+
+.vendeur-main .cards {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .vendeur-main .prod-img,
