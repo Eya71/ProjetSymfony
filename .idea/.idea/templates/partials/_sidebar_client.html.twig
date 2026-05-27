@@ -1,0 +1,113 @@
+<div class="overlay"
+     id="overlay"
+     style="display: none;">
+
+</div>
+
+<aside class="side-menu client-side-menu"
+       id="sideMenu">
+
+    <div class="side-header">
+
+        <a class="brand"
+           href="{{ path('app_login') }}">
+
+            <img class="brand-img"
+                 src="{{ asset('files_profil/logo.png') }}"
+                 alt="Importy">
+
+        </a>
+
+        <button class="menu-close-btn"
+                id="closeMenu"
+                type="button">
+
+            <i class="fa-solid fa-xmark"></i>
+
+        </button>
+
+    </div>
+
+    {% if app.user %}
+
+        <div class="section">
+
+            <h4>
+
+                Navigation
+
+            </h4>
+
+            <a href="{{ path('app_client_profile') }}">
+
+                <i class="fa-regular fa-user"></i>
+                Mon compte
+
+            </a>
+
+            <a href="{{ path('panier_index') }}">
+
+                <i class="fa-solid fa-bag-shopping"></i>
+                Panier
+
+            </a>
+
+            <a href="{{ path('demande_index') }}">
+
+                <i class="fa-solid fa-plus"></i>
+                Demande
+
+            </a>
+
+            <a href="{{ path('mes_demandes') }}">
+
+                <i class="fa-solid fa-list-check"></i>
+                Mes demandes
+
+            </a>
+
+            <a href="{{ path('app_notifications_index') }}">
+
+                <i class="fa-solid fa-bell"></i>
+                Notifications
+
+            </a>
+
+            <a href="{{ path('app_messagerie_index') }}">
+
+                <i class="fa-solid fa-envelope"></i>
+                Messages
+
+            </a>
+
+            <a href="{{ path('app_logout') }}">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Déconnexion
+
+            </a>
+
+        </div>
+
+    {% else %}
+
+        <div class="section">
+
+            <h4>
+
+                Compte
+
+            </h4>
+
+            <a href="{{ path('app_login') }}">
+
+                <i class="fa-regular fa-user"></i>
+                Login
+
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</aside>

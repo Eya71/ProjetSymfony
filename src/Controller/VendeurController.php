@@ -32,24 +32,15 @@ final class VendeurController extends AbstractController
  */
         $user = $this->getUser();
 
-        /*
-         * On vérifie que l'utilisateur connecté est bien un LegacyUser.
-         */
-        if (!$user instanceof LegacyUser) {
-            throw $this->createAccessDeniedException('Accès refusé');
+        if (!$user instanceof LegacyUser || $user->getLegacyRole() !== 'vendeur') {
+            return $this->redirectToRoute('app_login');
         }
 
-        /*
-         * On récupère son username.
-         */
-        $username = $user->getUsername();
-
-        /*
-         * On cherche le vendeur réel dans la table vendeur avec son username.
-         */
         $vendeur = $vendeurRepo->findOneBy([
-            'username' => $username,
+            'username' => $user->getUsername(),
         ]);
+
+
 
         /*
          * Si aucun vendeur n'est trouvé, on bloque l'accès.
@@ -104,7 +95,7 @@ final class VendeurController extends AbstractController
             }
         }
 
-        return $this->render('Vendeur/dashboard.html.twig', [
+        return $this->render('Vendeur/page_vendeur.html.twig', [
             'vendeur' => $vendeur,
             'produits' => $produits,
             'demandes' => $demandes,
@@ -147,7 +138,7 @@ final class VendeurController extends AbstractController
             return $this->redirectToRoute('vendeur_dashboard');
         }
 
-        return $this->render('Vendeur/edit_product.html.twig', [
+        return $this->render('Vendeur/page_vendeur.html.twig', [
             'produit' => $produit,
         ]);
     }

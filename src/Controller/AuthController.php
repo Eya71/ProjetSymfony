@@ -24,7 +24,7 @@ final class AuthController extends AbstractController
         if ($this->getUser() instanceof LegacyUser) {
 
             if ($this->isGranted('ROLE_VENDEUR')) {
-                return $this->redirectToRoute('app_vendeur_commandes');
+                return $this->redirectToRoute('vendeur_dashboard');
             }
 
             if ($this->isGranted('ROLE_CLIENT')) {

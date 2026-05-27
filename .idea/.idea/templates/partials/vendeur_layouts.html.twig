@@ -1,0 +1,55 @@
+{% extends 'base.html.twig' %}
+
+{% block stylesheets %}
+
+    <link rel="stylesheet"
+          href="{{ asset('css/style.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    {% include 'partials/vendeur_header.html.twig' %}
+
+    {% include 'partials/_sidebar_vendeur.html.twig' %}
+    {% for message in app.flashes('error') %}
+
+        <div class="flash-error">
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+
+    {% for message in app.flashes('success') %}
+
+        <div class="flash-success">
+
+            {{ message }}
+
+        </div>
+
+    {% endfor %}
+    <main class="page-wrapper">
+
+        <section class="page-header">
+
+            <h1 class="page-title">
+
+                {% block page_title %}{% endblock %}
+
+            </h1>
+
+        </section>
+        <section class="page-content">
+
+            {% block page_content %}{% endblock %}
+
+        </section>
+    </main>
+
+    {% include 'partials/_footer.html.twig' %}
+
+    <script src="{{ asset('js/menu.js') }}"></script>
+
+{% endblock %}
