@@ -65,8 +65,10 @@ final class VendeurProfileController extends AbstractController
             return $this->redirectToRoute('app_vendeur_profile');
         }
 
+
         return $this->render('user_profile/index.html.twig', [
-            'vendeur' => $vendeur,
+            'user' => $vendeur,
+            'returnRoute' => 'vendeur_dashboard',
         ]);
     }
 }

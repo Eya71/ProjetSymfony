@@ -6,6 +6,11 @@ Ce texte apparaît dans l'onglet du navigateur.
 #}
 {% block title %}Mes offres envoyées{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/commande_vendeur.css') }}">
+{% endblock %}
+
 {% block body %}
 
     {#
@@ -32,11 +37,13 @@ Ce texte apparaît dans l'onglet du navigateur.
                 </p>
             </div>
 
-            {#
-            offres|length permet de compter le nombre d'offres.
-            #}
+
             <div class="vendor-pill">
-                {{ offres|length }} offre(s)
+                <a href="{{ path('vendeur_dashboard') }}" >
+                    Retour
+                </a>
+
+
             </div>
         </section>
 
