@@ -20,7 +20,7 @@ final class VendeurOffresController extends AbstractController
     /**
      * Route de la page "Mes offres envoyées".
      *
-     * URL :
+     * URL
      * http://127.0.0.1:8000/vendeur/offres
      *
      * Nom de route :

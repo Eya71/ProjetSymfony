@@ -4,7 +4,7 @@
         <i class="fa-solid fa-align-justify"></i>
     </button>
 
-    <a class="logo" href="{{ path('app_vendeur_profile') }}" aria-label="Importy - Espace vendeur">
+    <a class="logo" href="{{ path('vendeur_dashboard') }}" aria-label="Importy - Espace vendeur">
         <img class="logo-img" src="../files_profil/logo.png" alt="Importy">
     </a>
 
@@ -17,14 +17,14 @@
             <i class="fa-solid fa-paper-plane" style="color:#B197FC;"></i>
             <span>Mes offres</span>
         </a>
-        <a href="{{ path('app_vendeur_notifications') }}" class="icon-item">
+        <a href="{{ path('app_notifications_index') }}" class="icon-item">
             <i class="fa-solid fa-bell" style="color:#74C0FC;"></i>
             <span>Notifications</span>
             <?php if ($notifCount > 0): ?>
             <span class="badge"><?= htmlspecialchars($notifCount) ?></span>
             <?php endif; ?>
         </a>
-        <a href="{{ path('app_vendeur_messages') }}" class="icon-item">
+        <a href="{{ path('app_messagerie_index') }}" class="icon-item">
             <i class="fa-solid fa-envelope" style="color:#B197FC;"></i>
             <span>Messages</span>
             <?php if ($messageCount > 0): ?>
@@ -35,36 +35,18 @@
             <i class="fa-solid fa-box-open" style="color:#B197FC;"></i>
             <span>Mes produits</span>
         </a>
-        <a href="{{ path('app_vendeur_compte') }}" class="icon-item">
+        <a href="{{ path('app_vendeur_profile') }}" class="icon-item">
             <i class="fa-regular fa-user" style="color:#74C0FC;"></i>
             <span>Mon compte</span>
         </a>
-        <a href="{{ path('app_vendeur_logout') }}" class="icon-item">
+        <a href="{{ path('app_logout') }}" class="icon-item">
             <i class="fa-solid fa-right-from-bracket" style="color:#74C0FC;"></i>
             <span>Logout</span>
         </a>
     </div>
 </header>
 
-    {% else %}
 
-        <div class="icons quick-actions">
 
-            <a href="#"
-               class="icon-item">
 
-                <i class="fa-regular fa-user"></i>
 
-                <span>
-
-                Se connecter
-
-            </span>
-
-            </a>
-
-        </div>
-
-    {% endif %}
-
-</header>
