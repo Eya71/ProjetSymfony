@@ -114,4 +114,17 @@ final class LegacyLoginAuthenticator extends AbstractLoginFormAuthenticator
 
         return new RedirectResponse($this->getLoginUrl($request));
     }
+
+    /**
+     * Cette méthode est obligatoire quand on utilise AbstractLoginFormAuthenticator.
+     *
+     * Elle indique à Symfony quelle route utiliser pour afficher la page de login.
+     *
+     * Si un utilisateur non connecté essaie d'accéder à une page protégée,
+     * Symfony va le rediriger vers cette URL.
+     */
+    protected function getLoginUrl(Request $request): string
+    {
+        return $this->urlGenerator->generate('app_login');
+    }
 }

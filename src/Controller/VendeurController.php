@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Security\LegacyUser;
 
 final class VendeurController extends AbstractController
 {
@@ -25,22 +26,48 @@ final class VendeurController extends AbstractController
         DemandeRepository $demandeRepo,
         EntityManagerInterface $em //enregistrer dans bd
     ): Response {
-        $vendeur = $this->getUser();
+        /*
+ * On récupère l'utilisateur connecté.
+ * Dans ton système, c'est un LegacyUser.
+ */
+        $user = $this->getUser();
 
-        if (!$vendeur instanceof Vendeur) {
+        /*
+         * On vérifie que l'utilisateur connecté est bien un LegacyUser.
+         */
+        if (!$user instanceof LegacyUser) {
             throw $this->createAccessDeniedException('Accès refusé');
+        }
+
+        /*
+         * On récupère son username.
+         */
+        $username = $user->getUsername();
+
+        /*
+         * On cherche le vendeur réel dans la table vendeur avec son username.
+         */
+        $vendeur = $vendeurRepo->findOneBy([
+            'username' => $username,
+        ]);
+
+        /*
+         * Si aucun vendeur n'est trouvé, on bloque l'accès.
+         */
+        if (!$vendeur) {
+            throw $this->createAccessDeniedException('Vendeur introuvable');
         }
 
         // Récupérer les produits du vendeur
         $produits = $produitRepo->findBy(
-            ['vendeur_username' => $vendeur],
-            ['created_at' => 'DESC']
+            ['vendeurUsername' => $vendeur],
+            ['createdAt' => 'DESC']
         );
 
         // Récupérer les demandes non traitées
         $demandes = $demandeRepo->findBy(
-            ['etat' => 'en_attente'],
-            ['created_at' => 'DESC']
+            ['etat' => 'en_attente']
+
         );
 
         // Gestion POST - Créer un produit
@@ -91,7 +118,13 @@ final class VendeurController extends AbstractController
         Request $request,
         EntityManagerInterface $em
     ): Response {
-        if ($produit->getVendeurUsername() !== $this->getUser()) {
+        $user = $this->getUser();
+
+        if (!$user instanceof LegacyUser) {
+            throw $this->createAccessDeniedException('Accès refusé');
+        }
+
+        if ($produit->getVendeurUsername()?->getUsername() !== $user->getUsername()) {
             throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres produits');
         }
 
@@ -125,8 +158,14 @@ final class VendeurController extends AbstractController
         Produit $produit,
         EntityManagerInterface $em
     ): Response {
-        if ($produit->getVendeurUsername() !== $this->getUser()) {
-            throw $this->createAccessDeniedException('Vous ne pouvez supprimer que vos propres produits');
+        $user = $this->getUser();
+
+        if (!$user instanceof LegacyUser) {
+            throw $this->createAccessDeniedException('Accès refusé');
+        }
+
+        if ($produit->getVendeurUsername()?->getUsername() !== $user->getUsername()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres produits');
         }
 
         $em->remove($produit);
@@ -155,7 +194,7 @@ final class VendeurController extends AbstractController
         // Créer une entité DealRequest (offre)
         $offer = new \App\Entity\DealRequest();
         $offer->setDemande($demande);
-        $offer->setVendeurUsername($this->getUser());
+        $offer->setVendeurUsername($vendeur);
         $offer->setPrixPropose((float)$prixPropose);
         $offer->setMessage($message);
         $offer->setCreatedAt(new \DateTime());
