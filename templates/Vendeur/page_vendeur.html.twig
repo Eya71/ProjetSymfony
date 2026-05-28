@@ -1,13 +1,14 @@
+
 {% extends 'partials/vendeur_layouts.html.twig' %}
 
-{% block page_title %}Espace Vendeur {% endblock %}
+
 
 {% block page_content %}
     <main class="client-page simple-client-page vendeur-main">
         <section class="client-content full-width-content">
             <div class="welcome-banner simple-banner">
                 <div class="welcome-user">
-                    {% if vendeur.idPhoto %}
+                    {% if vendeur.idPhoto is defined and vendeur.idPhoto%}
                         <img class="account-avatar-image welcome-avatar-image" src="{{ asset(vendeur.idPhoto) }}" alt="Photo de profil de {{ vendeur.username }}">
                     {% else %}
                         <div class="avatar-circle welcome-avatar">{{ vendeur.username|first|upper }}</div>
@@ -52,15 +53,23 @@
                     <div class="cards">
                         {% for produit in produits %}
                             <article class="inner-card">
-                                {% if produit.imagePath %}
-                                    <img class="prod-img" src="{{ asset(produit.imagePath) }}" alt="{{ produit.nomProduit }}">
-                                {% else %}
-                                    <img class="prod-img" src="{{ asset('files_profil/logo.png') }}" alt="Produit">
-                                {% endif %}
+
+                                <span class="product-badge">
+                                     {{ produit.categorie }}
+                                </span>
+
+                                <div class="product-image">
+                                    {% if produit.imagePath %}
+                                        <img src="{{ asset(produit.imagePath) }}" alt="{{ produit.nomProduit }}">
+                                    {% else %}
+                                        <img src="{{ asset('files_profil/logo.png') }}" alt="Produit">
+                                    {% endif %}
+                                </div>
 
                                 <h3>{{ produit.nomProduit }}</h3>
                                 <p class="meta">
-                                    {{ produit.categorie }} | {{ produit.prix }} TND
+                                    {{ produit.prix }} TND
+                                    {% if produit.createdAt %} | {{ produit.createdAt|date('d/m/Y') }}{% endif %}
                                 </p>
 
                                 <p><strong>Stock :</strong>
@@ -105,7 +114,7 @@
                                 <p class="meta">
                                     Client: {{ demande.username is defined and demande.username.username is defined ? demande.username.username : 'Client' }}
                                     | Budget: {{ demande.prix }} TND
-
+                                    {% if demande.createdAt %}| Date: {{ demande.createdAt|date('d/m/Y') }}{% endif %}
                                 </p>
                                 <p>{{ demande.description }}</p>
 
@@ -124,4 +133,8 @@
             </section>
         </section>
     </main>
+    <a href="{{ path('app_vendeur_commandes') }}" class="floating-cart-btn" aria-label="Voir les commandes">
+        <i class="fa-solid fa-handshake"></i>
+    </a>
+
 {% endblock %}

@@ -24,16 +24,12 @@
             <img class="logo-img" src="{{ asset('files_profil/logo.png') }}" alt="Importy">
         </a>
 
-        <div class="search">
-            <i class="fa fa-search"></i>
-            <input type="text" id="homeProductSearch" placeholder="Rechercher un produit, une marque...">
-        </div>
 
-        <div class="icons">
-            <a href="{{ app.user ? path('panier_index') : '#' }}" class="icon-item" {% if not app.user %}id="sidebarPanierTrigger"{% endif %}>
+         <div class="icons">
+             {#  <a href="{{ app.user ? path('panier_index') : '#' }}" class="icon-item" {% if not app.user %}id="sidebarPanierTrigger"{% endif %}>
                 <i class="fa-solid fa-bag-shopping" style="color:#B197FC;"></i>
                 <span>Votre Panier</span>
-            </a>
+            </a> #}
 
             <a href="{{ path('app_login') }}" class="icon-item">
                 <i class="fa-regular fa-user" style="color:#74C0FC;"></i>
@@ -101,9 +97,9 @@
         </section>
     </main>
 
-    <a href="{{ app.user ? path('panier_index') : '#' }}" class="floating-cart-btn" {% if not app.user %}id="floatingSidebarPanierTrigger"{% endif %} aria-label="Voir le panier">
+    {#  <a href="{{ app.user ? path('panier_index') : '#' }}" class="floating-cart-btn" {% if not app.user %}id="floatingSidebarPanierTrigger"{% endif %} aria-label="Voir le panier">
         <i class="fa-solid fa-bag-shopping"></i>
-    </a>
+    </a> #}
 
     {% include 'partials/_home_script.html.twig' %}
     {% include 'partials/_footer.html.twig' %}
