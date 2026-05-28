@@ -127,7 +127,7 @@
                                 <p class="meta">
                                     Client: {{ demande.username is defined and demande.username.username is defined ? demande.username.username : 'Client' }}
                                     | Budget: {{ demande.prix }} TND
-
+                                    {% if demande.createdAt %}| Date: {{ demande.createdAt|date('d/m/Y') }}{% endif %}
                                 </p>
                                 {% if demande.lienProduit %}
                                     <a href="{{ demande.lienProduit }}" target="_blank" class="secondary-btn">

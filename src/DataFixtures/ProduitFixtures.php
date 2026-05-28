@@ -27,8 +27,9 @@ class ProduitFixtures extends Fixture implements DependentFixtureInterface
         $produit1->setPrix('500.00');
         $produit1->setQuantite(1);
         $produit1->setCategorie('homme');
-        $produit1->setDecription('ceinture une seule pièce');
+        $produit1->setDescription('ceinture une seule pièce');
         $produit1->setImagePath('files_produit/coach.png');
+        $produit1->setcreatedAt(new \DateTimeImmutable('2026-04-27'));
         $manager->persist($produit1);
 
         $produit2 = new Produit();
@@ -37,8 +38,10 @@ class ProduitFixtures extends Fixture implements DependentFixtureInterface
         $produit2->setPrix('95.00');
         $produit2->setQuantite(15);
         $produit2->setCategorie('femme');
-        $produit2->setDecription('mask collagene');
+        $produit2->setDescription('mask collagene');
         $produit2->setImagePath('files_produit/mask.png');
+        $produit2->setcreatedAt(new \DateTimeImmutable('2026-04-20'));
+
         $manager->persist($produit2);
 
         $produit3 = new Produit();
@@ -47,8 +50,10 @@ class ProduitFixtures extends Fixture implements DependentFixtureInterface
         $produit3->setPrix('2100.00');
         $produit3->setQuantite(1);
         $produit3->setCategorie('femme');
-        $produit3->setDecription('dyson original');
+        $produit3->setDescription('dyson original');
         $produit3->setImagePath('files_produit/dyson.png');
+        $produit3->setcreatedAt(new \DateTimeImmutable('2026-05-27'));
+
         $manager->persist($produit3);
 
         $produit4 = new Produit();
@@ -57,8 +62,11 @@ class ProduitFixtures extends Fixture implements DependentFixtureInterface
         $produit4->setPrix('2000.00');
         $produit4->setQuantite(4);
         $produit4->setCategorie('beaute');
-        $produit4->setDecription('gucci flora');
+        $produit4->setDescription('gucci flora');
         $produit4->setImagePath('files_produit/gucci.png');
+        $produit4->setcreatedAt(new \DateTimeImmutable('2026-04-23'));
+
+
         $manager->persist($produit4);
 
         $manager->flush();
