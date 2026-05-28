@@ -20,7 +20,7 @@ class ReviewType extends AbstractType
                 'class' => DealRequest::class,
                 'choices' => $options['reviewable_deals'],
                 'choice_label' => function (DealRequest $deal) {
-                    return 'Deal #' . $deal->getId() . ' - ' . $deal->getPrixPropose() . ' TND';
+                    return 'Deal ' . $deal->getIdDemande()->getNomProduit() . ' - ' . $deal->getPrixPropose() . ' TND';
                 },
                 'placeholder' => 'Sélectionner le deal concerné',
                 'label' => 'Deal concerné',

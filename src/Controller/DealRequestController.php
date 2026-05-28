@@ -61,6 +61,7 @@ final class DealRequestController extends AbstractController
             );
 
         }
+        $demande = $offre->getIdDemande();
 
         $commande = new Commande();
 
@@ -71,6 +72,10 @@ final class DealRequestController extends AbstractController
         $commande->setVendeur(
             $offre->getVendeurUsername()
         );
+
+        $commande->setIdDemande($demande);
+
+
 
         $commande->setStatut('en cours');
 
@@ -87,7 +92,8 @@ final class DealRequestController extends AbstractController
         $entityManager->persist($commande);
 
         $offre->setStatus('accepted');
-        $demande = $offre->getIdDemande(); if ($demande) { $demande->setEtat('en cours'); }
+
+        if ($demande) { $demande->setEtat('en cours'); }
 
 
         $autresOffres = $dealRequestRepository->findBy([
