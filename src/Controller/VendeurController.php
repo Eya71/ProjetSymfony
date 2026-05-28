@@ -148,30 +148,6 @@ final class VendeurController extends AbstractController
         ]);
     }
 
-
-
-   /* #[Route('/vendeur/produit/{id}/supprimer', name: 'vendeur_delete_product', methods: ['POST'])]
-    #[IsGranted('ROLE_VENDEUR')]
-    public function deleteProduct(
-        Produit $produit,
-        EntityManagerInterface $em
-    ): Response {
-        $user = $this->getUser();
-
-        if (!$user instanceof LegacyUser) {
-            throw $this->createAccessDeniedException('Accès refusé');
-        }
-
-        if ($produit->getVendeurUsername()?->getUsername() !== $user->getUsername()) {
-            throw $this->createAccessDeniedException('Vous ne pouvez modifier que vos propres produits');
-        }
-
-        $em->remove($produit);
-        $em->flush();
-
-        $this->addFlash('success', 'Produit supprimé avec succès !');
-        return $this->redirectToRoute('vendeur_dashboard');
-    }*/
     #[Route('/vendeur/produit/{id}/supprimer', name: 'vendeur_delete_product', methods: ['POST'])]
     #[IsGranted('ROLE_VENDEUR')]
     public function deleteProduct(
@@ -245,6 +221,7 @@ final class VendeurController extends AbstractController
         $offer->setClientSeenAt($now);
         $offer->setVendeurSeenAt($now);
         $offer->setStatus('envoyee');
+        $offer->setClientUsername($client);
         $em->persist($offer);
         $em->flush();
         $this->addFlash('success', 'Offre envoyée avec succès !');
