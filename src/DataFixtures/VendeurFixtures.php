@@ -19,7 +19,7 @@ class VendeurFixtures extends Fixture implements FixtureGroupInterface
         $vendeur->setNumTel('55667788');
         $vendeur->setIdPhoto('files_profil/mohamed.png');
         $vendeur->setPwd('mohamed01');
-        $vendeur->setCreatedAt(new \DateTimeImmutable('2026-03-30 00:00:00'));
+        $vendeur->setCreatedAt(new \DateTimeImmutable('2026-03-30'));
 
         $manager->persist($vendeur);
 
@@ -31,7 +31,7 @@ class VendeurFixtures extends Fixture implements FixtureGroupInterface
         $vendeur1->setNumTel('554256968');
         $vendeur1->setIdPhoto('files_profil/farah.png');
         $vendeur1->setPwd('farah01');
-        $vendeur1->setCreatedAt(new \DateTimeImmutable('2026-03-30 00:00:00'));
+        $vendeur1->setCreatedAt(new \DateTimeImmutable('2026-04-12'));
 
         $manager->persist($vendeur1);
 
@@ -43,7 +43,8 @@ class VendeurFixtures extends Fixture implements FixtureGroupInterface
         $vendeur2->setNumTel('28595907');
         $vendeur2->setIdPhoto('files_profil/mahdi.png');
         $vendeur2->setPwd('mahdi01');
-        $vendeur2->setCreatedAt(new \DateTimeImmutable('2026-03-30 00:00:00'));
+        $vendeur2->setCreatedAt(new \DateTimeImmutable('2026-04-22'));
+
         $manager->persist($vendeur2);
 
 

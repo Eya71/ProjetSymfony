@@ -230,7 +230,7 @@ final class PanierController extends AbstractController
                     'nom_produit' => 'Commande panier - '.$commandeData['vendeur'],
                     'prix' => $commandeData['total'],
                     'lien_produit' => '',
-                    'descrption' => 'Commande creee depuis le panier : '.implode(', ', $lines),
+                    'description' => 'Commande creee depuis le panier : '.implode(', ', $lines),
                     'categorie' => $firstItem['categorie'] !== '' ? $firstItem['categorie'] : 'tous',
                     'id_photo' => $firstItem['image_path'],
                     'username_id' => (int) $clientId,

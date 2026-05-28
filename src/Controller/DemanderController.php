@@ -61,10 +61,11 @@ final class DemanderController extends AbstractController
             'description' => $description,
             'categorie' => $categorie,
             'id_photo' => $imagePath,
-            'username' => $user->getUsername(),
+
+            'username_id' => $connection->fetchOne(
+            'SELECT id FROM client WHERE username = :username',
+                ['username' => $user->getUsername()]),
             'etat' => 'en attente',
-            'created_at' => (new \DateTimeImmutable())->format('Y-m-d H:i:s'),
-            'source' => 'demande',
         ]);
         $demandeId = (int) $connection->lastInsertId();
 

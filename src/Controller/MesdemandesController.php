@@ -6,49 +6,92 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\DemandeRepository;
+use Doctrine\DBAL\Connection;
+use App\Entity\Demande;
+ use Doctrine\ORM\EntityManagerInterface;
 
-final class MesdemandesController extends AbstractController
-{
-    #[Route('/mes-demandes', name: 'mes_demandes')]
-    public function mesDemandes(
-        DemandeRepository $demandeRepository
-    ): Response {
-        if (!$this->getUser()) {
+use App\Repository\ClientRepository;
+use App\Repository\CommandeRepository;
 
-            return $this->redirectToRoute(
-                'app_login'
-            );
 
-        }
-        $demandes =
-            $demandeRepository->findBy(
-                [
-                    'username' => $this->getUser()->getUserIdentifier()
-                ],
-                [
-                    'id' => 'DESC'
-                ]
-            );
 
-        return $this->render(
-            'demandes/mes_demandes.html.twig',
-            [
-                'demandes' => $demandes
-            ]
-        );
+
+final class     MesdemandesController extends AbstractController
+
+{#[Route('/mes-demandes', name: 'mes_demandes')]
+public function mesDemandes(
+    DemandeRepository $demandeRepository,
+    ClientRepository $clientRepository
+): Response {
+
+    if (!$this->getUser()) {
+
+        return $this->redirectToRoute('app_login');
 
     }
-    #[Route('/demande/{id}', name: 'demande_details')]
-    public function details(
-        Demande $demande
-    ): Response {
 
-        return $this->render(
-            'demandes/details.html.twig',
-            [
-                'demande' => $demande
-            ]
-        );
+    $client = $clientRepository->findOneBy([
+        'username' => $this->getUser()->getUsername()
+    ]);
 
-    }
+    $demandes = $demandeRepository->findBy(
+        [
+            'username' => $client
+        ],
+        [
+            'id' => 'DESC'
+        ]
+    );
+
+    return $this->render(
+        'demandes/mes_demandes.html.twig',
+        [
+            'demandes' => $demandes
+        ]
+    );
+
+}
+
+#[Route('/demande/{id}', name: 'demande_details')]
+public function details(
+    Demande $demande,
+    CommandeRepository $commandeRepository
+): Response {
+
+    $commande = $commandeRepository->findOneBy([
+        'id_demande' => $demande
+    ]);
+
+    return $this->render(
+        'demandes/details.html.twig',
+        [
+            'demande' => $demande,
+            'commande' => $commande
+        ]
+    );
+
+}
+
+
+    #[Route('/demande/delete/{id}', name: 'demande_delete')]
+public function delete(
+    Demande $demande,
+    EntityManagerInterface $entityManager
+): Response {
+
+    $entityManager->remove($demande);
+
+    $entityManager->flush();
+
+    $this->addFlash(
+        'success',
+        'Demande supprimée avec succès.'
+    );
+
+    return $this->redirectToRoute('mes_demandes');
+
+}
+
+
+
 }

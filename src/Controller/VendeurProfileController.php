@@ -71,4 +71,32 @@ final class VendeurProfileController extends AbstractController
             'returnRoute' => 'vendeur_dashboard',
         ]);
     }
+
+#[Route('/vendeur/{username}', name: 'vendor_profile')]
+public function publicProfile(
+    string $username,
+    VendeurRepository $vendeurRepository
+): Response {
+
+    $vendeur = $vendeurRepository->findOneBy([
+        'username' => $username
+    ]);
+
+    if (!$vendeur) {
+
+        throw $this->createNotFoundException(
+            'Vendeur introuvable'
+        );
+
+    }
+
+    return $this->render(
+        'vendor_profile_client/index.html.twig',
+        [
+            'vendeur' => $vendeur
+        ]
+    );
+
+}
+
 }
