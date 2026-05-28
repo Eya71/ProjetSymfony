@@ -97,7 +97,7 @@
                 {% endif %}
             </section>
 
-            <section class="content-card">
+            <section class="content-card" id="demandes-clients">
                 <div class="section-head">
                     <h2>Demandes clients</h2>
                     <p>Vous pouvez proposer un deal</p>
@@ -107,8 +107,21 @@
                     <div class="cards">
                         {% for demande in demandes %}
                             <article class="inner-card">
+                                <span class="product-badge">
+                                    {{ demande.categorie }}
+                                </span>
                                 {% if demande.idPhoto %}
-                                    <img class="dem-img" src="{{ asset(demande.idPhoto) }}" alt="Demande">
+                                    {% if demande.lienProduit %}
+                                        <a href="{{ demande.lienProduit }}" target="_blank" class="demande-image-link">
+                                            <div class="product-image">
+                                                <img src="{{ asset(demande.idPhoto) }}" alt="{{ demande.nomProduit }}">
+                                            </div>
+                                        </a>
+                                    {% else %}
+                                        <div class="product-image">
+                                            <img src="{{ asset(demande.idPhoto) }}" alt="{{ demande.nomProduit }}">
+                                        </div>
+                                    {% endif %}
                                 {% endif %}
                                 <h3>{{ demande.nomProduit }}</h3>
                                 <p class="meta">
@@ -116,6 +129,11 @@
                                     | Budget: {{ demande.prix }} TND
 
                                 </p>
+                                {% if demande.lienProduit %}
+                                    <a href="{{ demande.lienProduit }}" target="_blank" class="secondary-btn">
+                                        Ouvrir lien
+                                    </a>
+                                {% endif %}
                                 <p>{{ demande.description }}</p>
 
                                 <form method="POST" action="{{ path('vendeur_send_offer') }}" class="offer-form">

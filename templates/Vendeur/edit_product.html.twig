@@ -1,5 +1,7 @@
 {% extends 'partials/vendeur_layouts.html.twig' %}
+
 {% block title %}Modification Produit{% endblock %}
+
 {% block page_content %}
     <main class="client-page simple-client-page vendeur-main">
         <section class="client-content full-width-content">
@@ -22,18 +24,27 @@
 
                             {% if produit.imagePath %}
                                 <div class="edit-product-image">
-                                    <img src="{{ asset(produit.imagePath) }}" alt="{{ produit.nomProduit }}">
+                                    <img id="previewImage"
+                                         src="{{ asset(produit.imagePath) }}"
+                                         alt="{{ produit.nomProduit }}">
                                 </div>
                             {% else %}
                                 <div class="edit-product-image">
-                                    <img src="{{ asset('files_profil/logo.png') }}" alt="Produit">
+                                    <img id="previewImage"
+                                         src="{{ asset('files_profil/logo.png') }}"
+                                         alt="Produit">
                                 </div>
                             {% endif %}
 
-                            <label class="edit-file-label">
+                            <label for="imageInput" class="edit-file-label" >
                                 Changer l’image
-                                <input type="file" name="image" accept="image/*">
                             </label>
+
+                            <input id="imageInput"
+                                   class="hidden-file-input"
+                                   type="file"
+                                   name="image"
+                                   accept="image/*">
                         </div>
 
                         <div class="edit-product-right">
@@ -73,11 +84,18 @@
                                 <option value="beaute" {% if produit.categorie == 'beaute' %}selected{% endif %}>Beauté</option>
                             </select>
 
-                            <textarea name="description" rows="5" placeholder="Description">{{ produit.description }}</textarea>
+                            <textarea name="description"
+                                      rows="5"
+                                      placeholder="Description">{{ produit.description }}</textarea>
 
                             <div class="product-actions">
-                                <button type="submit" class="primary-btn">Enregistrer les modifications</button>
-                                <a href="{{ path('vendeur_dashboard') }}" class="secondary-btn">Annuler</a>
+                                <button type="submit" class="primary-btn">
+                                    Enregistrer les modifications
+                                </button>
+
+                                <a href="{{ path('vendeur_dashboard') }}" class="secondary-btn">
+                                    Annuler
+                                </a>
                             </div>
 
                         </div>
@@ -88,4 +106,19 @@
 
         </section>
     </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const imageInput = document.getElementById('imageInput');
+            const previewImage = document.getElementById('previewImage');
+
+            imageInput.addEventListener('change', function () {
+                const file = this.files[0];
+
+                if (file) {
+                    previewImage.src = URL.createObjectURL(file);
+                }
+            });
+        });
+    </script>
 {% endblock %}
