@@ -18,66 +18,76 @@
 
 {% block page_content %}
 
-
-
-    <div class="container">
+    <div class="offers-container">
 
         {% for offre in offres %}
 
             <div class="offer-card">
 
-                <!-- VENDEUR -->
-                <div class="offer-header">
+                <!-- TOP -->
+                <div class="offer-top">
 
-                    <img src="{{ asset(offre.vendeurUsername.idPhoto) }}"
-                         class="avatar">
+                    <div class="vendeur-info">
 
-                    <a href="{{ path('vendor_profile', {
-                        'username': offre.vendeurUsername.username
-                    }) }}"
-                       class="vendeur-name">
+                        <img src="{{ asset(offre.vendeurUsername.idPhoto) }}"
+                             class="avatar"
+                             alt="vendeur">
 
-                        {{ offre.vendeurUsername.username }}
+                        <div class="vendeur-details">
 
-                    </a>
+                            <a href="{{ path('app_vendor_profile_client', {
+                                'username': offre.vendeurUsername.username
+                            }) }}"
+                               class="vendeur-name">
 
-                </div>
+                                {{ offre.vendeurUsername.username }}
 
-                <!-- PRIX -->
-                <div class="price">
+                            </a>
 
-                    {{ offre.prixPropose }} TND
+                            <span class="seller-badge">
+
+                            Vendeur vérifié
+
+                        </span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="price-box">
+
+                        {{ offre.prixPropose }} TND
+
+                    </div>
 
                 </div>
 
                 <!-- MESSAGE -->
-                <p class="message">
+                <div class="message-box">
 
                     {{ offre.message }}
 
-                </p>
+                </div>
 
                 <!-- ACTIONS -->
                 <div class="actions">
 
-                    <!-- ACCEPTER -->
                     <form method="POST"
                           action="{{ path('accepter_offre') }}">
 
                         <input type="hidden"
-                               name="id_deal"
+                               name="id"
                                value="{{ offre.id }}">
 
                         <button class="btn-accept">
 
-                            Accepter
+                            Accepter l'offre
 
                         </button>
 
                     </form>
 
-                    <!-- CHAT -->
-                    <a href="{{ path('messages', {'deal': offre.id}) }}"
+                    <a href="#"
                        class="btn-chat">
 
                         Chat
@@ -89,6 +99,7 @@
             </div>
 
         {% else %}
+
             <div class="empty-offers">
 
                 <div class="empty-icon">
@@ -105,11 +116,16 @@
 
                 <p>
 
-                    Les vendeurs n'ont pas encore proposé d'offres
-                    pour cette demande.
+                    Les vendeurs n'ont pas encore proposé
+                    d'offres pour cette demande.
 
                 </p>
+
             </div>
+
         {% endfor %}
+
     </div>
+
+
 {% endblock %}

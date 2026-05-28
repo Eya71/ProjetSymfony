@@ -82,6 +82,18 @@
 
                     <p>
 
+                        <strong>Statut :</strong>
+
+                        <span class="status-badge">
+
+                {{ commande.statut }}
+
+                        </span>
+
+                    </p>
+
+                    <p>
+
                         <strong>Vendeur :</strong>
 
                         {{ commande.vendeur.username }}
@@ -98,9 +110,6 @@
                     </p>
 
                 {% endif %}
-
-
-
 
             </div>
 
