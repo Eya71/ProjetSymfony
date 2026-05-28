@@ -1,9 +1,8 @@
 {% extends 'base.html.twig' %}
 
 {% block stylesheets %}
-
-    <link rel="stylesheet"
-          href="{{ asset('css/style.css') }}">
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/vendeur.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -50,6 +49,6 @@
 
     {% include 'partials/_footer.html.twig' %}
 
-    <script src="{{ asset('js/menu.js') }}"></script>
+    <script src="{{ asset('js/vendeur.js') }}"></script>
 
 {% endblock %}

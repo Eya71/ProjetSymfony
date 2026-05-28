@@ -8,7 +8,7 @@
         <section class="client-content full-width-content">
             <div class="welcome-banner simple-banner">
                 <div class="welcome-user">
-                    {% if vendeur.idPhoto %}
+                    {% if vendeur.idPhoto is defined and vendeur.idPhoto%}
                         <img class="account-avatar-image welcome-avatar-image" src="{{ asset(vendeur.idPhoto) }}" alt="Photo de profil de {{ vendeur.username }}">
                     {% else %}
                         <div class="avatar-circle welcome-avatar">{{ vendeur.username|first|upper }}</div>
@@ -53,11 +53,13 @@
                     <div class="cards">
                         {% for produit in produits %}
                             <article class="inner-card">
+                                <div class="product-image">
                                 {% if produit.imagePath %}
-                                    <img class="prod-img" src="{{ asset(produit.imagePath) }}" alt="{{ produit.nomProduit }}">
+                                    <img  src="{{ asset(produit.imagePath) }}" alt="{{ produit.nomProduit }}">
                                 {% else %}
-                                    <img class="prod-img" src="{{ asset('files_profil/logo.png') }}" alt="Produit">
+                                    <img  src="{{ asset('files_profil/logo.png') }}" alt="Produit">
                                 {% endif %}
+                                </div>
 
                                 <h3>{{ produit.nomProduit }}</h3>
                                 <p class="meta">

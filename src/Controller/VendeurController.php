@@ -140,6 +140,7 @@ final class VendeurController extends AbstractController
 
         return $this->render('Vendeur/page_vendeur.html.twig', [
             'produit' => $produit,
+            'vendeur' => $user,
         ]);
     }
 
