@@ -27,29 +27,76 @@ body {
   background: #f6f7fb;
 }
 
-.top-header {
-  width: 100%;
-  height: 80px;
-  background: white;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 30px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
+
 
 .header-left {
   display: flex;
   align-items: center;
 }
 
-.logo-img {
-  height: 90px;
-  object-fit: contain;
+.empty-offers{
+
+  background:white;
+
+  border-radius:20px;
+
+  padding:50px 30px;
+
+  text-align:center;
+
+  box-shadow:0 8px 25px rgba(0,0,0,0.05);
+
+  margin-top:30px;
+
 }
+
+.empty-icon{
+
+  width:90px;
+
+  height:90px;
+
+  margin:0 auto 20px;
+
+  border-radius:50%;
+
+  background:#f1efff;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  font-size:38px;
+
+  color:#6c4cff;
+
+}
+
+.empty-offers h3{
+
+  font-size:28px;
+
+  color:#1d1db5;
+
+  margin-bottom:10px;
+
+}
+
+.empty-offers p{
+
+  color:#777;
+
+  line-height:1.7;
+
+  max-width:500px;
+
+  margin:auto;
+
+}
+
+
 
 .avatar {
   width: 90px;

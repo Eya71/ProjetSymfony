@@ -9,12 +9,10 @@ use App\Repository\DemandeRepository;
 use Doctrine\DBAL\Connection;
 use App\Entity\Demande;
  use Doctrine\ORM\EntityManagerInterface;
-
 use App\Repository\ClientRepository;
 use App\Repository\CommandeRepository;
 
-
-
+use App\Repository\DealRequestRepository;
 
 final class     MesdemandesController extends AbstractController
 
@@ -73,7 +71,7 @@ public function details(
 }
 
 
-    #[Route('/demande/delete/{id}', name: 'demande_delete')]
+#[Route('/demande/delete/{id}', name: 'demande_delete')]
 public function delete(
     Demande $demande,
     EntityManagerInterface $entityManager
@@ -89,6 +87,30 @@ public function delete(
     );
 
     return $this->redirectToRoute('mes_demandes');
+
+}
+
+#[Route('/demande/{id}/offres', name: 'demande_offres')]
+public function offres(
+    int $id,
+    DealRequestRepository $dealRequestRepository
+): Response {
+
+    $offres = $dealRequestRepository->findBy(
+        [
+            'id_demande' => $id
+        ],
+        [
+            'prix_propose' => 'ASC'
+        ]
+    );
+
+    return $this->render(
+        'offre/offres.html.twig',
+        [
+            'offres' => $offres
+        ]
+    );
 
 }
 

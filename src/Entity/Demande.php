@@ -26,7 +26,7 @@ class Demande
     private ?string $lien_produit = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $descrption = null;
+    private ?string $description = null;
 
     #[ORM\Column(length: 30)]
     private ?string $categorie = null;
@@ -99,14 +99,14 @@ class Demande
         return $this;
     }
 
-    public function getDescrption(): ?string
+    public function getDescription(): ?string
     {
-        return $this->descrption;
+        return $this->description;
     }
 
-    public function setDescrption(string $descrption): static
+    public function setDescription(string $description): static
     {
-        $this->descrption = $descrption;
+        $this->descrption = $description;
 
         return $this;
     }

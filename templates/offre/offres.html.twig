@@ -1,0 +1,115 @@
+
+{% extends 'partials/client_layout.html.twig' %}
+
+{% block stylesheets %}
+
+    {{ parent() }}
+
+    <link rel="stylesheet"
+          href="{{ asset('css/offres.css') }}">
+
+{% endblock %}
+
+{% block page_title %}
+
+    Les offres
+
+{% endblock %}
+
+{% block page_content %}
+
+
+
+    <div class="container">
+
+        {% for offre in offres %}
+
+            <div class="offer-card">
+
+                <!-- VENDEUR -->
+                <div class="offer-header">
+
+                    <img src="{{ asset(offre.vendeurUsername.idPhoto) }}"
+                         class="avatar">
+
+                    <a href="{{ path('vendor_profile', {
+                        'username': offre.vendeurUsername.username
+                    }) }}"
+                       class="vendeur-name">
+
+                        {{ offre.vendeurUsername.username }}
+
+                    </a>
+
+                </div>
+
+                <!-- PRIX -->
+                <div class="price">
+
+                    {{ offre.prixPropose }} TND
+
+                </div>
+
+                <!-- MESSAGE -->
+                <p class="message">
+
+                    {{ offre.message }}
+
+                </p>
+
+                <!-- ACTIONS -->
+                <div class="actions">
+
+                    <!-- ACCEPTER -->
+                    <form method="POST"
+                          action="{{ path('accepter_offre') }}">
+
+                        <input type="hidden"
+                               name="id_deal"
+                               value="{{ offre.idDeal }}">
+
+                        <button class="btn-accept">
+
+                            Accepter
+
+                        </button>
+
+                    </form>
+
+                    <!-- CHAT -->
+                    <a href="{{ path('messages', {'deal': offre.idDeal}) }}"
+                       class="btn-chat">
+
+                        Chat
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        {% else %}
+            <div class="empty-offers">
+
+                <div class="empty-icon">
+
+                    <i class="fa-regular fa-envelope-open"></i>
+
+                </div>
+
+                <h3>
+
+                    Aucune offre pour le moment
+
+                </h3>
+
+                <p>
+
+                    Les vendeurs n'ont pas encore proposé d'offres
+                    pour cette demande.
+
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
