@@ -48,11 +48,18 @@
                     <h2>Mes produits postés</h2>
                     <p>{{ produits is defined ? produits|length : 0 }} produit(s)</p>
                 </div>
+                <div class="category-buttons" data-target="produit-card">
+                    <button type="button" class="category-btn active" data-categorie="all">Tous</button>
+                    <button type="button" class="category-btn" data-categorie="femme">Femme</button>
+                    <button type="button" class="category-btn" data-categorie="homme">Homme</button>
+                    <button type="button" class="category-btn" data-categorie="maison">Maison</button>
+                    <button type="button" class="category-btn" data-categorie="beaute">Beauté</button>
+                </div>
 
                 {% if produits is defined and produits is not empty %}
                     <div class="cards">
                         {% for produit in produits %}
-                            <article class="inner-card">
+                            <article class="inner-card produit-card" data-categorie="{{ produit.categorie|lower }}">
 
                                 <span class="product-badge">
                                      {{ produit.categorie }}
@@ -102,11 +109,18 @@
                     <h2>Demandes clients</h2>
                     <p>Vous pouvez proposer un deal</p>
                 </div>
+                <div class="category-buttons" data-target="demande-card">
+                    <button type="button" class="category-btn active" data-categorie="all">Tous</button>
+                    <button type="button" class="category-btn" data-categorie="femme">Femme</button>
+                    <button type="button" class="category-btn" data-categorie="homme">Homme</button>
+                    <button type="button" class="category-btn" data-categorie="maison">Maison</button>
+                    <button type="button" class="category-btn" data-categorie="beaute">Beauté</button>
+                </div>
 
                 {% if demandes is defined and demandes is not empty %}
                     <div class="cards">
                         {% for demande in demandes %}
-                            <article class="inner-card">
+                            <article class="inner-card demande-card" data-categorie="{{ demande.categorie|lower }}">
                                 <span class="product-badge">
                                     {{ demande.categorie }}
                                 </span>
@@ -127,7 +141,6 @@
                                 <p class="meta">
                                     Client: {{ demande.username is defined and demande.username.username is defined ? demande.username.username : 'Client' }}
                                     | Budget: {{ demande.prix }} TND
-                                    {% if demande.createdAt %}| Date: {{ demande.createdAt|date('d/m/Y') }}{% endif %}
                                 </p>
                                 {% if demande.lienProduit %}
                                     <a href="{{ demande.lienProduit }}" target="_blank" class="secondary-btn">
@@ -154,5 +167,37 @@
     <a href="{{ path('app_vendeur_commandes') }}" class="floating-cart-btn" aria-label="Voir les commandes">
         <i class="fa-solid fa-handshake"></i>
     </a>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const buttonGroups = document.querySelectorAll('.category-buttons');
 
+            buttonGroups.forEach(function (group) {
+                const targetClass = group.dataset.target;
+                const buttons = group.querySelectorAll('.category-btn');
+                const cards = document.querySelectorAll('.' + targetClass);
+
+                buttons.forEach(function (button) {
+                    button.addEventListener('click', function () {
+                        const selectedCategory = this.dataset.categorie.toLowerCase();
+
+                        buttons.forEach(function (btn) {
+                            btn.classList.remove('active');
+                        });
+
+                        this.classList.add('active');
+
+                        cards.forEach(function (card) {
+                            const cardCategory = card.dataset.categorie.toLowerCase();
+
+                            if (selectedCategory === 'all' || cardCategory === selectedCategory) {
+                                card.style.display = '';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+                    });
+                });
+            });
+        });
+    </script>
 {% endblock %}

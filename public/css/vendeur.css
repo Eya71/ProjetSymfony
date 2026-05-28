@@ -378,3 +378,31 @@
 .edit-file-label:hover {
     background: #6d28d9;
 }
+.category-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin: 15px 0 22px;
+}
+
+.category-btn {
+    border: none;
+    background: #f3e8ff;
+    color: #7c3aed;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.category-btn:hover {
+    background: #ede9fe;
+    color: #6d28d9;
+}
+
+.category-btn.active {
+    background: #7c3aed;
+    color: white;
+}

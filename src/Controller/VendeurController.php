@@ -57,7 +57,7 @@ final class VendeurController extends AbstractController
 
         // Récupérer les demandes non traitées
         $demandes = $demandeRepo->findBy(
-            ['etat' => 'en_attente']
+            ['etat' => 'en attente']
 
         );
 
