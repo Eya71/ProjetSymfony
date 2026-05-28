@@ -1,6 +1,7 @@
 <?php
 namespace App\Controller;
 
+use App\Entity\DealRequest;
 use App\Entity\Vendeur;
 use App\Entity\Produit;
 use App\Entity\Demande;
@@ -57,7 +58,7 @@ final class VendeurController extends AbstractController
 
         // Récupérer les demandes non traitées
         $demandes = $demandeRepo->findBy(
-            ['etat' => 'en_attente']
+            ['etat' => 'en attente']
 
         );
 
@@ -167,33 +168,47 @@ final class VendeurController extends AbstractController
         return $this->redirectToRoute('vendeur_dashboard');
     }
 
+
     #[Route('/vendeur/offre', name: 'vendeur_send_offer', methods: ['POST'])]
     #[IsGranted('ROLE_VENDEUR')]
     public function sendOffer(
         Request $request,
         DemandeRepository $demandeRepo,
+        VendeurRepository $vendeurRepository,
         EntityManagerInterface $em
     ): Response {
+
+        $user = $this->getUser();
+        if (!$user instanceof LegacyUser) {
+            return $this->redirectToRoute('app_login');
+        }
+        $username = $user->getUsername();
+        $vendeur = $vendeurRepository->findOneBy([
+            'username' => $username,
+        ]);
+
+        if (!$vendeur) {
+            throw $this->createNotFoundException('Vendeur introuvable');
+        }
         $idDemande = $request->request->get('id_demande');
         $prixPropose = $request->request->get('prix_propose');
         $message = $request->request->get('message');
-
         $demande = $demandeRepo->find($idDemande);
         if (!$demande) {
             throw $this->createNotFoundException('Demande non trouvée');
         }
-
-        // Créer une entité DealRequest (offre)
-        $offer = new \App\Entity\DealRequest();
-        $offer->setDemande($demande);
+        $offer = new DealRequest();
+        $offer->setIdDemande($demande);
         $offer->setVendeurUsername($vendeur);
-        $offer->setPrixPropose((float)$prixPropose);
+        $offer->setPrixPropose((string) $prixPropose);
         $offer->setMessage($message);
-        $offer->setCreatedAt(new \DateTime());
-
+        $now = new \DateTimeImmutable();
+        $offer->setCreatedAt($now);
+        $offer->setClientSeenAt($now);
+        $offer->setVendeurSeenAt($now);
+        $offer->setStatus('envoyee');
         $em->persist($offer);
         $em->flush();
-
         $this->addFlash('success', 'Offre envoyée avec succès !');
         return $this->redirectToRoute('vendeur_dashboard');
     }
