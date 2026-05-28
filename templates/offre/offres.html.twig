@@ -66,7 +66,7 @@
 
                         <input type="hidden"
                                name="id_deal"
-                               value="{{ offre.idDeal }}">
+                               value="{{ offre.id }}">
 
                         <button class="btn-accept">
 
@@ -77,7 +77,7 @@
                     </form>
 
                     <!-- CHAT -->
-                    <a href="{{ path('messages', {'deal': offre.idDeal}) }}"
+                    <a href="{{ path('messages', {'deal': offre.id}) }}"
                        class="btn-chat">
 
                         Chat

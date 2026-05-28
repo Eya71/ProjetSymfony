@@ -41,7 +41,7 @@ class Commande
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $total = null;
 
-    #[ORM\Column(name: 'created_at', type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
     public function getId(): ?int
     {
