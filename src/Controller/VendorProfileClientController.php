@@ -31,13 +31,7 @@ final class VendorProfileClientController extends AbstractController
         ProduitRepository $produitRepository,
         EntityManagerInterface $entityManager
     ): Response {
-        /*
-         * 1. Vérifier que l'utilisateur connecté est un client
-         *
-         * Interface :
-         * Cette partie ne s'affiche pas.
-         * Elle protège seulement la page.
-         */
+
         $this->denyAccessUnlessGranted('ROLE_CLIENT');
 
         /*
@@ -147,18 +141,18 @@ final class VendorProfileClientController extends AbstractController
         // Carte 2 : Commandes terminées
         $commandesTerminees = $commandeRepository->count([
             'vendeur' => $vendor,
-            'statut' => 'terminée',
+            'statut' => 'termine',
         ]);
 
         // Carte 3 : Deals acceptés
         $dealsAcceptes = $dealRequestRepository->count([
             'vendeur_username' => $vendor,
-            'status' => 'accepté',
+            'status' => 'accepted',
         ]);
 
         // Carte 4 : Produits publiés
         $produitsPublies = $produitRepository->count([
-            'vendeur_username' => $vendor,
+            'vendeurUsername' => $vendor,
         ]);
 
         /*
@@ -176,7 +170,7 @@ final class VendorProfileClientController extends AbstractController
         $deals = $dealRequestRepository->findBy([
             'client_username' => $client,
             'vendeur_username' => $vendor,
-            'status' => 'accepté',
+            'status' => 'accepted',
         ]);
 
         $reviewableDeals = [];
