@@ -130,12 +130,8 @@
 
                 {% endif %}
 
-                <a href="#"
-                   class="btn-offres">
-
-                    Voir les offres
-
-                </a>
+                <a href="{{ path('demande_offres', { 'id': demande.id }) }}" class="offers-btn">
+                    Voir les offres </a>
 
                 <a href="{{ path('demande_delete', {'id': demande.id}) }}"
                    class="delete-btn"

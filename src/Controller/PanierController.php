@@ -297,7 +297,7 @@ final class PanierController extends AbstractController
     private function fetchItems(Connection $connection, LegacyImagePathResolver $imagePathResolver, string $username): array
     {
         $items = $connection->fetchAllAssociative(
-            'SELECT p.id AS id_panier, p.quantite, p.date_ajout, pr.id AS id_produit, pr.nom_produit, pr.prix, pr.decription AS description, pr.categorie, pr.image_path, pr.quantite AS stock
+            'SELECT p.id AS id_panier, p.quantite, p.date_ajout, pr.id AS id_produit, pr.nom_produit, pr.prix, pr.description AS description, pr.categorie, pr.image_path, pr.quantite AS stock
              FROM panier p
              INNER JOIN produit pr ON pr.id = p.id_produit
              WHERE p.username = :username

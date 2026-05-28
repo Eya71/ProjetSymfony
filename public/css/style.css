@@ -1937,22 +1937,3 @@ select {
 
     font-weight:600;
 }
-/* FORCE logo vendeur petit */
-.top-header.simple-client-header .logo {
-    width: 220px !important;
-    height: 120px !important;
-    overflow: visible !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    flex: 0 0 220px !important;
-}
-
-.top-header.simple-client-header .logo-img {
-    width: 180px !important;
-    height: auto !important;
-    max-width: 180px !important;
-    max-height: 100px !important;
-    object-fit: contain !important;
-    transform: none !important;
-}
