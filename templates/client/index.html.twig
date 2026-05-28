@@ -127,11 +127,14 @@
 
                                 <div class="product-actions">
                                     <a class="small-btn" href="{{ path('produit_details', {'id': prod.id}) }}">Voir produit</a>
-                                    <form action="{{ path('panier_add') }}" method="post" class="add-to-cart-form">
-                                        <input type="hidden" name="id_produit" value="{{ prod.id|default(0) }}">
-                                        <input type="hidden" name="redirect_to" value="{{ path('app_client_interface') }}">
-                                        <button class="primary-btn product-cart-btn" type="submit" {{ prod.quantite|default(0) <= 0 ? 'disabled' : '' }}>
-                                            {{ prod.quantite|default(0) <= 0 ? 'Indisponible' : 'Ajouter au panier' }}
+
+                                    <form action="{{ path('panier_add') }}" method="POST" class="add-to-cart-form">
+
+                                        <input type="hidden" name="id_produit" value="{{ prod.id }}">
+
+                                        <input type="hidden" name="redirect_to" value="{{ app.request.uri }}">
+
+                                        <button type="submit" class="primary-btn product-cart-btn"{{ prod.quantite <= 0 ? 'disabled' : '' }}>{{ prod.quantite <= 0? 'Indisponible': 'Ajouter au panier' }}
                                         </button>
                                     </form>
                                 </div>

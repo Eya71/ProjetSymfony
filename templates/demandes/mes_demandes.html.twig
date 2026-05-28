@@ -44,7 +44,7 @@
 
                     <div class="image-wrapper">
 
-                        <img src="{{ asset(demande.imagePath) }}"
+                        <img src="{{ asset(demande.idphoto) }}"
                              alt="{{ demande.nomProduit }}">
 
                     </div>
@@ -63,25 +63,19 @@
 
                         </p>
 
-                        <p class="date">
 
-                            {{ demande.createdAt|date('d/m/Y') }}
-
-                        </p>
 
                         <span class="etat-badge">
 
                         {{ demande.etat }}
 
                     </span>
-
-                        <a href="#"
+                        <a href="{{ path('demande_details', {'id': demande.id}) }}"
                            class="details-btn">
 
                             Voir détails
 
                         </a>
-
                     </div>
 
                 </div>

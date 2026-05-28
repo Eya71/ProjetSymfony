@@ -80,7 +80,7 @@
                     <h3>{{ p.nom_produit|e }}</h3>
                     <p class="meta">{{ p.categorie|e }} | {{ p.prix|e }} TND | {{ p.created_at|e }}</p>
                     <p><strong>Stock :</strong> {{ p.quantite > 0 ? (p.quantite ~ ' disponible(s)') : 'Rupture de stock' }}</p>
-                    <p>{{ p.description|e }}</p
+                    <p>{{ p.description|e }}</p>
                     <div class="product-actions">
                         <a href="/edit_product.php?id=<?= (int)$p['id_produit'] ?>" class="secondary-btn">Modifier</a>
                         <form action="/php/delete_product.php" method="post" onsubmit="return confirm('Voulez-vous vraiment supprimer ce produit ?');">

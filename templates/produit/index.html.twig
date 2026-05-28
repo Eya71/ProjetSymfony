@@ -55,13 +55,20 @@
                     {{ produit.prix }} DT
 
                 </p>
+                <form action="{{ path('panier_add_legacy', {'id': produit.id}) }}"
+                      method="POST">
 
-                <form action="{{ path('panier_add', {'id': produit.id}) }}"
-                      method="post">
-                    <button type="submit" class="btn-cart">
-                        ajouter panier
+                    <button type="submit"
+                            class="btn-cart"
+                            {{ produit.quantite <= 0 ? 'disabled' : '' }}>
+
+                        {{ produit.quantite <= 0
+                        ? 'Indisponible'
+                        : 'Ajouter panier' }}
                     </button>
                 </form>
+
+
 
                 <div class="detail-actions">
 
