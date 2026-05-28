@@ -26,8 +26,10 @@ final class VendeurController extends AbstractController
         DemandeRepository $demandeRepo,
         EntityManagerInterface $em //enregistrer dans bd
     ): Response {
-
-
+        /*
+ * On récupère l'utilisateur connecté.
+ * Dans ton système, c'est un LegacyUser.
+ */
         $user = $this->getUser();
 
         if (!$user instanceof LegacyUser || $user->getLegacyRole() !== 'vendeur') {
@@ -40,7 +42,9 @@ final class VendeurController extends AbstractController
 
 
 
-
+        /*
+         * Si aucun vendeur n'est trouvé, on bloque l'accès.
+         */
         if (!$vendeur) {
             throw $this->createAccessDeniedException('Vendeur introuvable');
         }
@@ -53,7 +57,7 @@ final class VendeurController extends AbstractController
 
         // Récupérer les demandes non traitées
         $demandes = $demandeRepo->findBy(
-            ['etat' => 'en attente']
+            ['etat' => 'en_attente']
 
         );
 
@@ -75,7 +79,7 @@ final class VendeurController extends AbstractController
                 $produit->setDescription($description ?? '');
                 $produit->setVendeurUsername($vendeur);
 
-
+                // Traiter l'image si envoyée
                 if ($image && $image->isValid()) {
                     //creation d'un nom unique de l'image
                     $filename = bin2hex(random_bytes(16)) . '.' . $image->guessExtension();
