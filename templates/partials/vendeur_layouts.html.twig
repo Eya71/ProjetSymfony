@@ -5,8 +5,8 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('css/vendeur_style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/page_vendeur.css') }}">
+
+    <link rel="stylesheet" href="{{ asset('css/vendeur.css') }}">
 {% endblock %}
 
 {% block body %}
@@ -17,9 +17,8 @@
             <i class="fa-solid fa-align-justify"></i>
         </button>
 
-        <a class="logo" href="{{ path('vendeur_dashboard') }}" aria-label="Importy - Espace vendeur">
-            <img class="logo-img" src="../files_profil/logo.png" alt="Importy">
-        </a>
+       {#  <a class="logo" href="{{ path('vendeur_dashboard') }}" aria-label="Importy - Espace vendeur">
+            <img class="brand-img" src="{{ asset('files_profil/logo.png') }}" alt="Importy">        </a>#}
 
         <div class="icons quick-actions">
             <a href="{{ path('app_vendeur_commandes') }}" class="icon-item">

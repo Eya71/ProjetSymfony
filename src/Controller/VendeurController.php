@@ -56,10 +56,7 @@ final class VendeurController extends AbstractController
         );
 
         // Récupérer les demandes non traitées
-        $demandes = $demandeRepo->findBy(
-            ['etat' => 'en_attente']
-
-        );
+        $demandes = $demandeRepo->findAll();
 
         // Gestion POST - Créer un produit
         if ($request->isMethod('POST')) {
@@ -101,7 +98,6 @@ final class VendeurController extends AbstractController
             'demandes' => $demandes,
         ]);
     }
-
     #[Route('/vendeur/produit/{id}/modifier', name: 'vendeur_edit_product', methods: ['GET', 'POST'])]
     #[IsGranted('ROLE_VENDEUR')]
     public function editProduct(
@@ -121,30 +117,40 @@ final class VendeurController extends AbstractController
 
         if ($request->isMethod('POST')) {
             $produit->setNomProduit($request->request->get('nom_produit'));
-            $produit->setPrix((float)$request->request->get('prix'));
-            $produit->setQuantite((int)$request->request->get('quantite'));
+            $produit->setPrix((float) $request->request->get('prix'));
+            $produit->setQuantite((int) $request->request->get('quantite'));
             $produit->setCategorie($request->request->get('categorie'));
             $produit->setDescription($request->request->get('description'));
 
             $image = $request->files->get('image');
+
             if ($image && $image->isValid()) {
                 $filename = bin2hex(random_bytes(16)) . '.' . $image->guessExtension();
-                $image->move($this->getParameter('kernel.project_dir') . '/public/files_produit', $filename);
+
+                $image->move(
+                    $this->getParameter('kernel.project_dir') . '/public/files_produit',
+                    $filename
+                );
+
                 $produit->setImagePath('/files_produit/' . $filename);
             }
-//manestaamlouch persist 5ater lproduits exste dans le base de données
+
             $em->flush();
-            $this->addFlash('success', 'Produit modifié avec succès !');//!!!!!!!!!!!!!!!!
+
+            $this->addFlash('success', 'Produit modifié avec succès !');
+
             return $this->redirectToRoute('vendeur_dashboard');
         }
 
-        return $this->render('Vendeur/page_vendeur.html.twig', [
+        return $this->render('Vendeur/edit_product.html.twig', [
             'produit' => $produit,
             'vendeur' => $user,
         ]);
     }
 
-    #[Route('/vendeur/produit/{id}/supprimer', name: 'vendeur_delete_product', methods: ['POST'])]
+
+
+   /* #[Route('/vendeur/produit/{id}/supprimer', name: 'vendeur_delete_product', methods: ['POST'])]
     #[IsGranted('ROLE_VENDEUR')]
     public function deleteProduct(
         Produit $produit,
@@ -165,6 +171,40 @@ final class VendeurController extends AbstractController
 
         $this->addFlash('success', 'Produit supprimé avec succès !');
         return $this->redirectToRoute('vendeur_dashboard');
+    }*/
+    #[Route('/vendeur/produit/{id}/supprimer', name: 'vendeur_delete_product', methods: ['POST'])]
+    #[IsGranted('ROLE_VENDEUR')]
+    public function deleteProduct(
+        Produit $produit,
+        EntityManagerInterface $em
+    ): Response {
+        $user = $this->getUser();
+
+        if (!$user instanceof LegacyUser) {
+            throw $this->createAccessDeniedException('Accès refusé');
+        }
+
+        if ($produit->getVendeurUsername()?->getUsername() !== $user->getUsername()) {
+            throw $this->createAccessDeniedException('Vous ne pouvez supprimer que vos propres produits');
+        }
+
+        // Supprimer aussi l'image du dossier public/files_produit
+        $imagePath = $produit->getImagePath();
+
+        if ($imagePath) {
+            $fullPath = $this->getParameter('kernel.project_dir') . '/public' . $imagePath;
+
+            if (file_exists($fullPath)) {
+                unlink($fullPath);
+            }
+        }
+
+        $em->remove($produit);
+        $em->flush();
+
+        $this->addFlash('success', 'Produit supprimé avec succès !');
+
+        return $this->redirectToRoute('vendeur_dashboard');
     }
 
     #[Route('/vendeur/offre', name: 'vendeur_send_offer', methods: ['POST'])]
@@ -172,28 +212,41 @@ final class VendeurController extends AbstractController
     public function sendOffer(
         Request $request,
         DemandeRepository $demandeRepo,
+        VendeurRepository $vendeurRepository,
         EntityManagerInterface $em
     ): Response {
+
+        $user = $this->getUser();
+        if (!$user instanceof LegacyUser) {
+            return $this->redirectToRoute('app_login');
+        }
+        $username = $user->getUsername();
+        $vendeur = $vendeurRepository->findOneBy([
+            'username' => $username,
+        ]);
+
+        if (!$vendeur) {
+            throw $this->createNotFoundException('Vendeur introuvable');
+        }
         $idDemande = $request->request->get('id_demande');
         $prixPropose = $request->request->get('prix_propose');
         $message = $request->request->get('message');
-
         $demande = $demandeRepo->find($idDemande);
         if (!$demande) {
             throw $this->createNotFoundException('Demande non trouvée');
         }
-
-        // Créer une entité DealRequest (offre)
-        $offer = new \App\Entity\DealRequest();
-        $offer->setDemande($demande);
+        $offer = new DealRequest();
+        $offer->setIdDemande($demande);
         $offer->setVendeurUsername($vendeur);
-        $offer->setPrixPropose((float)$prixPropose);
+        $offer->setPrixPropose((string) $prixPropose);
         $offer->setMessage($message);
-        $offer->setCreatedAt(new \DateTime());
-
+        $now = new \DateTimeImmutable();
+        $offer->setCreatedAt($now);
+        $offer->setClientSeenAt($now);
+        $offer->setVendeurSeenAt($now);
+        $offer->setStatus('envoyee');
         $em->persist($offer);
         $em->flush();
-
         $this->addFlash('success', 'Offre envoyée avec succès !');
         return $this->redirectToRoute('vendeur_dashboard');
     }

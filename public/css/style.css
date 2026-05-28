@@ -155,39 +155,13 @@ body {
     text-decoration: none;
     color: rebeccapurple;
 }
-/*
-.icons a {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
 
-    text-decoration: none;
-    color: #340d7d;
-    font-size: 12px;
-    font-weight: 600;
-}
-
-.icons a i {
-    font-size: 22px;
-    margin-bottom: 6px;
-}
-
-.icons a span {
-    display: block;
-    margin-top: 4px;
-    white-space: nowrap;
-    text-align: center;
-}*/
 .overlay {
     position: fixed;
     inset: 0;
     background: rgba(0, 0, 0, 0.4);
     display: none;
     z-index: 999;
-}
-.overlay.active {
-    display: block;
 }
 
 .side-menu {
@@ -559,9 +533,6 @@ body {
     margin-bottom: 10px;
     color: #171196;
     line-height: 1.3;
-    margin-top: 12px;
-    position: relative;
-    z-index: 2;
 }
 
 .product-card p {
@@ -1916,15 +1887,14 @@ select {
             0 10px 30px rgba(0,0,0,0.08);
 
     transition:0.3s;
-    overflow: hidden;
 }
 
 .product-card:hover{
 
     transform:translateY(-5px);
 }
-
-/*.product-card img{
+/*
+.product-card img{
 
     width:100%;
 
@@ -1935,7 +1905,6 @@ select {
     border-radius:20px;
 }
 */
-
 .price{
 
     font-size:20px;
@@ -1968,4 +1937,22 @@ select {
 
     font-weight:600;
 }
+/* FORCE logo vendeur petit */
+.top-header.simple-client-header .logo {
+    width: 220px !important;
+    height: 120px !important;
+    overflow: visible !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 220px !important;
+}
 
+.top-header.simple-client-header .logo-img {
+    width: 180px !important;
+    height: auto !important;
+    max-width: 180px !important;
+    max-height: 100px !important;
+    object-fit: contain !important;
+    transform: none !important;
+}
