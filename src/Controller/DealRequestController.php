@@ -87,11 +87,14 @@ final class DealRequestController extends AbstractController
         $entityManager->persist($commande);
 
         $offre->setStatus('accepted');
+        $demande = $offre->getIdDemande(); if ($demande) { $demande->setEtat('en cours'); }
 
 
         $autresOffres = $dealRequestRepository->findBy([
-            'idDemande' => $offre->getIdDemande()
+            'id_demande' => $offre->getIdDemande()
         ]);
+
+
 
         foreach ($autresOffres as $autreOffre) {
 
@@ -101,9 +104,7 @@ final class DealRequestController extends AbstractController
                 $offre->getId()
             ) {
 
-                $autreOffre->setStatus(
-                    'rejected'
-                );
+                $entityManager->remove( $autreOffre );
 
             }
 

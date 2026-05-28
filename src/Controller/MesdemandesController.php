@@ -11,7 +11,6 @@ use App\Entity\Demande;
  use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\ClientRepository;
 use App\Repository\CommandeRepository;
-
 use App\Repository\DealRequestRepository;
 
 final class     MesdemandesController extends AbstractController
@@ -93,13 +92,12 @@ public function delete(
 #[Route('/demande/{id}/offres', name: 'demande_offres')]
 public function offres(
     int $id,
-    DealRequestRepository $dealRequestRepository
+    DealRequestRepository $dealRequestRepository,
+    DemandeRepository $demandeRepository
 ): Response {
-
+    $demande = $demandeRepository->find($id);
     $offres = $dealRequestRepository->findBy(
-        [
-            'id_demande' => $id
-        ],
+        [ 'id_demande' => $demande, 'status' => 'envoyee' ],
         [
             'prix_propose' => 'ASC'
         ]
