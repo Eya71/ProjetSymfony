@@ -1,0 +1,123 @@
+
+{% extends 'partials/client_layout.html.twig' %}
+{% block stylesheets %}
+
+    {{ parent() }}
+
+    <link rel="stylesheet"
+          href="{{ asset('css/demande.css') }}">
+
+
+{% endblock %}
+{% block page_title %} Demander un produit {% endblock %}
+
+{% block page_content %}
+
+    <div class="cart-toast"
+         id="cartToast">
+
+        Produit ajouté dans le panier.
+
+    </div>
+
+    <div class="card">
+
+        {% for message in app.flashes('error') %}
+
+            <div class="alert alert-danger">
+
+                {{ message }}
+
+            </div>
+
+        {% endfor %}
+
+        {% for message in app.flashes('success') %}
+
+            <div class="alert alert-success">
+
+                {{ message }}
+
+            </div>
+
+        {% endfor %}
+
+        <form class="form"
+              action="{{ path('demande_store') }}"
+              method="POST"
+              enctype="multipart/form-data">
+
+            <input type="file"
+                   name="image"
+                   id="imageInput"
+                   hidden
+                   accept="image/*">
+
+            <div class="container">
+
+                <div class="image-box"
+                     id="imageBox"
+                     title="Cliquez pour ajouter une image">
+
+                    <img id="imagePreview"
+                         style="display:none;"
+                         alt="Aperçu">
+
+                    <span id="imagePlaceholder">
+
+                        Photo
+
+                    </span>
+
+                </div>
+
+                <div class="form-fields">
+
+                    <input type="text"
+                           name="nom_produit"
+                           placeholder="Nom du produit">
+
+                    <input type="number"
+                           name="prix"
+                           placeholder="Prix">
+
+                    <select name="categorie"
+                            required>
+
+                        <option>tous</option>
+                        <option>femme</option>
+                        <option>homme</option>
+                        <option>maison</option>
+                        <option>beaute</option>
+
+                    </select>
+
+                    <input type="url"
+                           name="lien_produit"
+                           placeholder="Lien produit (https://...)">
+
+                </div>
+
+            </div>
+
+            <textarea name="description"
+                      placeholder="Description">
+
+            </textarea>
+
+            <div class="form-actions">
+
+                <button type="submit">
+
+                    Publier
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+{% endblock %}
+

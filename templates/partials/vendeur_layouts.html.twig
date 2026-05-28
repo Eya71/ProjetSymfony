@@ -1,55 +1,96 @@
+{# templates/partials/vendeur_layouts.html.twig #}
 {% extends 'base.html.twig' %}
+{% block title %}Espace-Vendeur{% endblock %}
+
 
 {% block stylesheets %}
-
-    <link rel="stylesheet"
-          href="{{ asset('css/style.css') }}">
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/vendeur_style.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/page_vendeur.css') }}">
 {% endblock %}
 
 {% block body %}
 
-    {% include 'partials/vendeur_header.html.twig' %}
 
-    {% include 'partials/_sidebar_vendeur.html.twig' %}
-    {% for message in app.flashes('error') %}
+    <header class="top-header simple-client-header">
+        <button id="menuBtn" class="menu-btn" type="button" aria-label="Ouvrir le menu">
+            <i class="fa-solid fa-align-justify"></i>
+        </button>
 
-        <div class="flash-error">
+        <a class="logo" href="{{ path('vendeur_dashboard') }}" aria-label="Importy - Espace vendeur">
+            <img class="logo-img" src="../files_profil/logo.png" alt="Importy">
+        </a>
 
-            {{ message }}
+        <div class="icons quick-actions">
+            <a href="{{ path('app_vendeur_commandes') }}" class="icon-item">
+                <i class="fa-solid fa-handshake" style="color:#B197FC;"></i>
+                <span>Mes commandes</span>
+            </a>
+            <a href="{{ path('app_vendeur_offres') }}" class="icon-item">
+                <i class="fa-solid fa-paper-plane" style="color:#B197FC;"></i>
+                <span>Mes offres</span>
+            </a>
+            <a href="{{ path('app_notifications_index') }}" class="icon-item">
+                <i class="fa-solid fa-bell" style="color:#74C0FC;"></i>
+                <span>Notifications</span>
 
+                {% if notifCount is defined and notifCount > 0 %}
+                    <span class="badge">{{ notifCount }}</span>
+                {% endif %}
+            </a>
+            <a href="{{ path('app_messagerie_index') }}" class="icon-item">
+                <i class="fa-solid fa-envelope" style="color:#B197FC;"></i>
+                <span>Messages</span>
+                {% if messageCount is defined and messageCount > 0 %}
+                    <span class="badge">{{ messageCount }}</span>
+                {% endif %}
+            </a>
+            <a href="#mes-produits" class="icon-item">
+                <i class="fa-solid fa-box-open" style="color:#B197FC;"></i>
+                <span>Mes produits</span>
+            </a>
+            <a href="{{ path('app_vendeur_profile') }}" class="icon-item">
+                <i class="fa-regular fa-user" style="color:#74C0FC;"></i>
+                <span>Mon compte</span>
+            </a>
+            <a href="{{ path('app_logout') }}" class="icon-item">
+                <i class="fa-solid fa-right-from-bracket" style="color:#74C0FC;"></i>
+                <span>Logout</span>
+            </a>
         </div>
+    </header>
 
+
+
+
+
+
+
+    {# Sidebar vendeur (partial déjà présent dans votre projet) #}
+    {% include 'partials/_sidebar_vendeur.html.twig' %}
+
+    {# Flash messages #}
+    {% for message in app.flashes('error') %}
+        <div class="flash-error">{{ message }}</div>
     {% endfor %}
 
     {% for message in app.flashes('success') %}
-
-        <div class="flash-success">
-
-            {{ message }}
-
-        </div>
-
+        <div class="flash-success">{{ message }}</div>
     {% endfor %}
+
     <main class="page-wrapper">
 
-        <section class="page-header">
 
-            <h1 class="page-title">
-
-                {% block page_title %}{% endblock %}
-
-            </h1>
-
-        </section>
         <section class="page-content">
-
             {% block page_content %}{% endblock %}
-
         </section>
     </main>
 
     {% include 'partials/_footer.html.twig' %}
+{% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
     <script src="{{ asset('js/menu.js') }}"></script>
-
+    <script src="{{ asset('js/vendeur.js') }}"></script>
 {% endblock %}

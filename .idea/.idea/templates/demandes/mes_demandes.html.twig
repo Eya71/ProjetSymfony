@@ -1,0 +1,122 @@
+{% extends 'partials/client_layout.html.twig' %}
+
+{% block stylesheets %}
+
+    {{ parent() }}
+
+    <link rel="stylesheet"
+          href="{{ asset('css/demande.css') }}">
+
+{% endblock %}
+
+{% block page_title %}
+
+    Mes demandes
+
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="page-demandes">
+
+        <div class="demandes-header">
+
+        <span class="count-pill">
+
+            {{ demandes|length }} demande(s)
+
+        </span>
+
+            <a href="{{ path('demande_index') }}"
+               class="new-demand-btn">
+
+                + Nouvelle demande
+
+            </a>
+
+        </div>
+
+        <div class="container">
+
+            {% for demande in demandes %}
+
+                <div class="demande-card">
+
+                    <div class="image-wrapper">
+
+                        <img src="{{ asset(demande.imagePath) }}"
+                             alt="{{ demande.nomProduit }}">
+
+                    </div>
+
+                    <div class="card-content">
+
+                        <h3>
+
+                            {{ demande.nomProduit }}
+
+                        </h3>
+
+                        <p class="prix">
+
+                            {{ demande.prix }} DT
+
+                        </p>
+
+                        <p class="date">
+
+                            {{ demande.createdAt|date('d/m/Y') }}
+
+                        </p>
+
+                        <span class="etat-badge">
+
+                        {{ demande.etat }}
+
+                    </span>
+
+                        <a href="#"
+                           class="details-btn">
+
+                            Voir détails
+
+                        </a>
+
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <div class="empty-state">
+
+                    <i class="fa-regular fa-folder-open"></i>
+
+                    <h3>
+
+                        Aucune demande
+
+                    </h3>
+
+                    <p>
+
+                        Vous n'avez encore publié aucune demande.
+
+                    </p>
+
+                    <a class="add-btn"
+                       href="{{ path('demande_index') }}">
+
+                        Publier ma première demande
+
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+{% endblock %}

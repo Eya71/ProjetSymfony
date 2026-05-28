@@ -68,19 +68,29 @@ final class LegacyLoginAuthenticator extends AbstractLoginFormAuthenticator
         TokenInterface $token,
         string $firewallName
     ): ?Response {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($targetPath);
-        }
-
+        /*
+         * On récupère l'utilisateur connecté après le login.
+         */
         $user = $token->getUser();
 
+        /*
+         * Dans ton système, l'utilisateur connecté est un LegacyUser.
+         * Donc on vérifie son rôle avec getLegacyRole().
+         */
         if ($user instanceof LegacyUser) {
+
+            /*
+             * Si c'est un client, on l'envoie vers l'interface client.
+             */
             if ($user->getLegacyRole() === 'client') {
                 return new RedirectResponse(
                     $this->urlGenerator->generate('app_client_interface')
                 );
             }
 
+            /*
+             * Si c'est un vendeur, on l'envoie vers le dashboard vendeur.
+             */
             if ($user->getLegacyRole() === 'vendeur') {
                 return new RedirectResponse(
                     $this->urlGenerator->generate('vendeur_dashboard')
@@ -88,20 +98,12 @@ final class LegacyLoginAuthenticator extends AbstractLoginFormAuthenticator
             }
         }
 
+        /*
+         * Si le rôle n'est pas reconnu, on revient vers login.
+         */
         return new RedirectResponse(
             $this->urlGenerator->generate('app_login')
         );
-    }
-
-    protected function getLoginUrl(Request $request): string
-    {
-        return $this->urlGenerator->generate('app_login');
-    }
-
-    public function supports(Request $request): bool
-    {
-        return $request->attributes->get('_route') === 'app_login'
-            && $request->isMethod('POST');
     }
 
     public function onAuthenticationFailure(
@@ -111,5 +113,18 @@ final class LegacyLoginAuthenticator extends AbstractLoginFormAuthenticator
         $request->getSession()->set(SecurityRequestAttributes::AUTHENTICATION_ERROR, $exception);
 
         return new RedirectResponse($this->getLoginUrl($request));
+    }
+
+    /**
+     * Cette méthode est obligatoire quand on utilise AbstractLoginFormAuthenticator.
+     *
+     * Elle indique à Symfony quelle route utiliser pour afficher la page de login.
+     *
+     * Si un utilisateur non connecté essaie d'accéder à une page protégée,
+     * Symfony va le rediriger vers cette URL.
+     */
+    protected function getLoginUrl(Request $request): string
+    {
+        return $this->urlGenerator->generate('app_login');
     }
 }

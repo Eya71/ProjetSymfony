@@ -64,7 +64,8 @@ final class ClientProfileController extends AbstractController
         }
 
         return $this->render('user_profile/index.html.twig', [
-            'client' => $client,
+            'user' => $client,
+            'returnRoute' => 'app_client_interface',
         ]);
     }
 

@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Login - IMPORTY{% endblock %}
+{% block body_class %}inscription-body{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('css/style_inscription.css') }}">
+{% endblock %}
+
+{% block body %}
+    <div class="inscription-container">
+        <h2>Login</h2>
+
+        {% if error %}
+            <div style="margin-bottom:16px;padding:12px 14px;border-radius:12px;background:#fff1f1;color:#b42318;border:1px solid #f1b5b5;">
+                Nom d'utilisateur, mot de passe ou role incorrect.
+            </div>
+        {% endif %}
+
+        <form id="loginForm" action="{{ path('app_login') }}" method="post">
+            <input
+                type="text"
+                name="username"
+                placeholder="Nom d'utilisateur"
+                value="{{ last_username }}"
+                required>
+
+            <input type="password" name="password" placeholder="Mot de passe" required>
+
+            <div class="role">
+                <label>
+                    <input type="radio" name="role" value="client" {{ last_role != 'vendeur' ? 'checked' : '' }}>
+                    <span>Client</span>
+                </label>
+
+                <label>
+                    <input type="radio" name="role" value="vendeur" {{ last_role == 'vendeur' ? 'checked' : '' }}>
+                    <span>Vendeur</span>
+                </label>
+            </div>
+
+            <button type="submit">Login</button>
+            <a href="{{ path('app_signup') }}">Tu n'as pas un compte ? Créer un compte</a>
+        </form>
+    </div>
+{% endblock %}

@@ -11,17 +11,17 @@
     <main class="account-page">
         <section class="client-card profile-card account-card">
             <div class="profile-top">
-                {% if client.idPhoto is not empty %}
+                {% if user.idPhoto is not empty %}
                     <img
                             class="account-avatar-image"
-                            src="{{ asset(client.idPhoto) }}"
-                            alt="Photo de profil de {{ client.username }}"
+                            src="{{ asset(user.idPhoto) }}"
+                            alt="Photo de profil de {{ user.username }}"
                     >
                 {% endif %}
 
                 <div>
                     <h2>Mon compte</h2>
-                    <p>Bienvenue {{ client.username }}</p>
+                    <p>Bienvenue {{ user.username }}</p>
                 </div>
             </div>
 
@@ -40,22 +40,22 @@
             <div class="profile-details account-details">
                 <p>
                     <strong>Nom d'utilisateur :</strong>
-                    {{ client.username }}
+                    {{ user.username }}
                 </p>
 
                 <p>
                     <strong>Email :</strong>
-                    {{ client.email|default('Non renseigné') }}
+                    {{ user.email|default('Non renseigné') }}
                 </p>
 
                 <p>
                     <strong>Adresse :</strong>
-                    {{ client.adresse|default('Non renseignée') }}
+                    {{ user.adresse|default('Non renseignée') }}
                 </p>
 
                 <p>
                     <strong>Téléphone :</strong>
-                    {{ client.numTel|default('Non renseigné') }}
+                    {{ user.numTel|default('Non renseigné') }}
                 </p>
             </div>
 
@@ -66,7 +66,7 @@
                         type="email"
                         name="email"  {# recupere par le controller #}
                         placeholder="Email"
-                        value="{{ client.email }}"
+                        value="{{ user.email }}"
                         required
                 >
 
@@ -74,7 +74,7 @@
                         type="text"
                         name="adresse"
                         placeholder="Adresse"
-                        value="{{ client.adresse }}"
+                        value="{{ user.adresse }}"
                         required
                 >
 
@@ -82,7 +82,7 @@
                         type="tel"
                         name="num_tel"
                         placeholder="Téléphone"
-                        value="{{ client.numTel }}"
+                        value="{{ user.numTel }}"
                         required
                 >
 
@@ -98,7 +98,9 @@
             </form>
 
             <div class="account-actions">
-                <a href="{{ path('app_client_interface') }}" class="secondary-btn">Retour</a>
+                <a href="{{ path(returnRoute|default('app_login')) }}" class="secondary-btn">
+                    Retour
+                </a>
                 <a href="{{ path('app_logout') }}" class="small-btn" id="logoutAccountLink">Se déconnecter</a>
             </div>
 

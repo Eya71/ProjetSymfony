@@ -1,0 +1,198 @@
+{% extends 'base.html.twig' %}
+
+{#
+Titre de la page.
+Ce texte apparaît dans l'onglet du navigateur.
+#}
+{% block title %}Mes offres envoyées{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/commande_vendeur.css') }}">
+{% endblock %}
+
+{% block body %}
+
+    {#
+    Conteneur principal de la page.
+    La classe vendor-shell existe dans ton CSS.
+    #}
+    <div class="vendor-shell">
+
+        {#
+        Bloc violet en haut de la page.
+        Il affiche :
+        - le titre de la page
+        - une petite description
+        - le nombre total d'offres envoyées
+        #}
+        <section class="vendor-hero-card">
+            <div>
+                <div class="vendor-kicker">Suivi commercial</div>
+
+                <h2>Mes offres envoyées</h2>
+
+                <p class="vendor-hero-text">
+                    Retrouvez toutes vos propositions, leurs montants et accédez rapidement au chat associé.
+                </p>
+            </div>
+
+
+            <div class="vendor-pill">
+                <a href="{{ path('vendeur_dashboard') }}" >
+                    Retour
+                </a>
+
+
+            </div>
+        </section>
+
+        {#
+        Si la liste des offres est vide,
+        on affiche un message simple.
+        #}
+        {% if offres is empty %}
+
+            <div class="vendor-empty-box">
+                <h3>Aucune offre envoyée</h3>
+
+                <p>
+                    Vous n’avez pas encore envoyé d’offre à un client.
+                </p>
+            </div>
+
+        {% else %}
+
+            {#
+            Si le vendeur a envoyé des offres,
+            on les affiche sous forme de cartes.
+            #}
+            <div class="vendor-list">
+
+                {#
+                Boucle sur chaque offre.
+                Chaque variable "offre" représente un objet DealRequest.
+                #}
+                {% for offre in offres %}
+
+                    <div class="vendor-record-card">
+
+                        {#
+                        En-tête de la carte.
+                        Il contient :
+                        - le nom du produit
+                        - le client
+                        - la date
+                        - le prix proposé
+                        - le statut
+                        #}
+                        <div class="vendor-record-head">
+
+                            <div>
+
+                                {#
+                                Nom du produit.
+
+                                offre.idDemande appelle getIdDemande()
+                                offre.idDemande.nomProduit appelle getNomProduit()
+
+                                On met une condition pour éviter une erreur
+                                si la demande liée n'existe pas.
+                                #}
+                                <h3>
+                                    {{ offre.idDemande ? offre.idDemande.nomProduit : 'Produit inconnu' }}
+                                </h3>
+
+                                <div class="vendor-meta-row">
+
+                                    {#
+                                    Username du client.
+
+                                    offre.clientUsername appelle getClientUsername()
+                                    offre.clientUsername.username appelle getUsername()
+                                    #}
+                                    <span class="vendor-chip">
+                                    <i class="fa-regular fa-user"></i>
+                                    {{ offre.clientUsername ? offre.clientUsername.username : 'Client inconnu' }}
+                                </span>
+
+                                    {#
+                                    Date de création de l'offre.
+
+                                    offre.createdAt appelle getCreatedAt()
+                                    Le filtre date permet d'afficher la date proprement.
+                                    #}
+                                    <span class="vendor-chip">
+                                    <i class="fa-regular fa-calendar"></i>
+                                    {{ offre.createdAt ? offre.createdAt|date('Y-m-d H:i:s') : 'Date inconnue' }}
+                                </span>
+
+                                    {#
+                                    Prix proposé par le vendeur.
+
+                                    offre.prixPropose appelle getPrixPropose()
+                                    #}
+                                    <span class="vendor-chip strong">
+                                    <i class="fa-solid fa-coins"></i>
+                                    {{ offre.prixPropose }} TND
+                                </span>
+
+                                </div>
+                            </div>
+
+                            {#
+                            Statut de l'offre.
+
+                            Exemple :
+                            - pending
+                            - accepted
+                            - refused
+                            - Accepte
+                            #}
+                            <span class="vendor-status-chip">
+                            {{ offre.status }}
+                        </span>
+
+                        </div>
+
+                        {#
+                        Message envoyé par le vendeur dans son offre.
+
+                        offre.message appelle getMessage()
+                        #}
+                        <p class="vendor-message-preview">
+                            {{ offre.message }}
+                        </p>
+
+                        {#
+                        Bouton pour ouvrir la messagerie liée à cette offre.
+
+                        On utilise la route :
+                        app_messagerie_start
+
+                        Cette route attend un paramètre :
+                        idDeal
+
+                        offre.id appelle getId()
+                        donc cela donne l'id de l'offre DealRequest.
+                        #}
+                        <div class="vendor-actions-row">
+                            <a class="btn-link" href="{{ path('app_messagerie_start', { idDeal: offre.id }) }}">
+                                Ouvrir chat
+                            </a>
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+{% endblock %}
+
+
+

@@ -1,0 +1,132 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}IMPORTY : Mon Compte{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/client-profile.css') }}">
+{% endblock %}
+
+{% block body %}
+    <main class="account-page">
+        <section class="client-card profile-card account-card">
+            <div class="profile-top">
+                {% if client.idPhoto is not empty %}
+                    <img
+                            class="account-avatar-image"
+                            src="{{ asset(client.idPhoto) }}"
+                            alt="Photo de profil de {{ client.username }}"
+                    >
+                {% endif %}
+
+                <div>
+                    <h2>Mon compte</h2>
+                    <p>Bienvenue {{ client.username }}</p>
+                </div>
+            </div>
+
+            {% for message in app.flashes('success') %}
+                <div class="account-message success-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            {% for message in app.flashes('error') %}
+                <div class="account-message error-message">
+                    {{ message }}
+                </div>
+            {% endfor %}
+
+            <div class="profile-details account-details">
+                <p>
+                    <strong>Nom d'utilisateur :</strong>
+                    {{ client.username }}
+                </p>
+
+                <p>
+                    <strong>Email :</strong>
+                    {{ client.email|default('Non renseigné') }}
+                </p>
+
+                <p>
+                    <strong>Adresse :</strong>
+                    {{ client.adresse|default('Non renseignée') }}
+                </p>
+
+                <p>
+                    <strong>Téléphone :</strong>
+                    {{ client.numTel|default('Non renseigné') }}
+                </p>
+            </div>
+
+            <form class="account-form" method="post" enctype="multipart/form-data">
+                <h3>Modifier mes données</h3>
+
+                <input
+                        type="email"
+                        name="email"  {# recupere par le controller #}
+                        placeholder="Email"
+                        value="{{ client.email }}"
+                        required
+                >
+
+                <input
+                        type="text"
+                        name="adresse"
+                        placeholder="Adresse"
+                        value="{{ client.adresse }}"
+                        required
+                >
+
+                <input
+                        type="tel"
+                        name="num_tel"
+                        placeholder="Téléphone"
+                        value="{{ client.numTel }}"
+                        required
+                >
+
+                <label for="fileInput" class="account-upload">
+                    <span class="account-upload-btn">Modifier la photo</span>
+                    <input id="fileInput" class="account-file-input" type="file" name="image" accept="image/*">
+                    <span class="account-file-name" id="fileName">Aucun fichier choisi</span>
+                </label>
+
+                <button type="submit" class="primary-btn">
+                    Enregistrer les modifications
+                </button>
+            </form>
+
+            <div class="account-actions">
+                <a href="{{ path('app_client_interface') }}" class="secondary-btn">Retour</a>
+                <a href="{{ path('app_logout') }}" class="small-btn" id="logoutAccountLink">Se déconnecter</a>
+            </div>
+
+        </section>
+    </main>
+
+    <script>
+        const logoutAccountLink = document.getElementById('logoutAccountLink');
+        const fileInput = document.getElementById('fileInput');
+        const fileName = document.getElementById('fileName');
+
+        if (fileInput && fileName) {
+            fileInput.addEventListener('change', function () {
+                fileName.textContent = fileInput.files && fileInput.files[0]
+                    ? fileInput.files[0].name
+                    : 'Aucun fichier choisi';
+            });
+        }
+
+        if (logoutAccountLink) {
+            logoutAccountLink.addEventListener('click', function (event) {
+                const confirmed = window.confirm('Es-tu sûre que tu veux te déconnecter ?');
+
+                if (!confirmed) {
+                    event.preventDefault();
+                }
+            });
+        }
+    </script>
+
+{% endblock %}

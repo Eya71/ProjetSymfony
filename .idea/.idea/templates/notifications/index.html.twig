@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}IMPORTY : Notifications{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('css/notifications.css') }}">
+{% endblock %}
+
+{% block body %}
+    {% include 'partials/_header_client.html.twig' with {'notifCount': notifCount, 'messageCount': messageCount, 'photoUrl': photoUrl} %}
+
+    <main class="notifications-page">
+        <div class="notifications-container">
+            <div class="notifications-header">
+                <h1>Notifications</h1>
+                <button type="button" id="markAllReadBtn" class="primary-btn">Tout marquer comme lu</button>
+            </div>
+
+            {% if items is empty %}
+                <p class="notifications-empty">Aucune notification.</p>
+            {% else %}
+                <ul class="notifications-list" id="notificationsList">
+                    {% for n in items %}
+                        <li class="notif-row {{ n.is_read ? 'is-read' : 'is-unread' }}" data-id="{{ n.id_notif }}">
+                            <a href="{{ n.link|default('#') }}" class="notif-link" data-mark-read>
+                                <span class="notif-type-icon notif-type-{{ n.type }}">
+                                    {% if n.type == 'new_message' %}<i class="fa-solid fa-envelope"></i>
+                                    {% elseif n.type == 'new_demande' %}<i class="fa-solid fa-bag-shopping"></i>
+                                    {% elseif n.type == 'new_product' %}<i class="fa-solid fa-tag"></i>
+                                    {% else %}<i class="fa-solid fa-bell"></i>{% endif %}
+                                </span>
+                                <div class="notif-meta">
+                                    <strong>{{ n.title }}</strong>
+                                    {% if n.body %}<p>{{ n.body }}</p>{% endif %}
+                                    <time>{{ n.created_at }}</time>
+                                </div>
+                                {% if not n.is_read %}<span class="notif-dot"></span>{% endif %}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </main>
+
+    <script src="{{ asset('js/notifications.js') }}" defer></script>
+{% endblock %}

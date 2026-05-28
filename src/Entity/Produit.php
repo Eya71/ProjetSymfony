@@ -14,10 +14,20 @@ class Produit
     #[ORM\Column]
     private ?int $id = null;
 
+    /*
+     * Relation avec le vendeur.
+     *
+     * Dans la base, la colonne s'appelle vendeur_username_id.
+     * Dans Symfony, la propriété s'appelle vendeurUsername.
+     */
     #[ORM\ManyToOne(inversedBy: 'produits')]
     #[ORM\JoinColumn(name: 'vendeur_username_id', referencedColumnName: 'id')]
     private ?Vendeur $vendeurUsername = null;
 
+    /*
+     * Dans la base : nom_produit
+     * Dans Symfony : nomProduit
+     */
     #[ORM\Column(name: 'nom_produit', length: 255)]
     private ?string $nomProduit = null;
 
@@ -30,11 +40,30 @@ class Produit
     #[ORM\Column(length: 255)]
     private ?string $categorie = null;
 
-    #[ORM\Column(name: 'decription', length: 255)]
+    /*
+     * Attention :
+     * Ta base semble avoir une colonne "decription" avec faute.
+     * Donc on garde name: 'decription' pour correspondre à la base.
+     *
+     * Si tu renommes la colonne en "description",
+     * il faudra changer ici aussi.
+     */
+    #[ORM\Column(name: 'description', type: Types::TEXT, nullable: true)]
     private ?string $description = null;
 
+    /*
+     * Dans la base : image_path
+     * Dans Symfony : imagePath
+     */
     #[ORM\Column(name: 'image_path', length: 255)]
     private ?string $imagePath = null;
+
+    /*
+     * Dans la base : created_at
+     * Dans Symfony : createdAt
+     */
+    #[ORM\Column(name: 'created_at', type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $createdAt = null;
 
     public function getId(): ?int
     {
@@ -70,9 +99,9 @@ class Produit
         return $this->prix;
     }
 
-    public function setPrix(string $prix): static
+    public function setPrix(string|float $prix): static
     {
-        $this->prix = $prix;
+        $this->prix = (string) $prix;
 
         return $this;
     }
@@ -125,4 +154,15 @@ class Produit
         return $this;
     }
 
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(?\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
 }

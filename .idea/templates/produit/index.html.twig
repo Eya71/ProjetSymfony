@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+    Détails produit
+{% endblock %}
+
+{% block stylesheets %}
+
+    <link rel="stylesheet"
+          href="{{ asset('css/style.css') }}">
+
+    <link rel="stylesheet"
+          href="{{ asset('css/produit_details.css') }}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+{% endblock %}
+
+{% block body %}
+
+    {% include 'partials/_header_client.html.twig' %}
+
+    {% include 'partials/_sidebar_client.html.twig' %}
+
+    <div class="main-container">
+
+        <div class="product-page">
+
+            <div class="product-left">
+
+                <img src="{{ asset(produit.imagePath) }}"
+                     alt="{{ produit.nomProduit }}">
+
+            </div>
+
+            <div class="product-right">
+
+                <span class="category">
+
+                    {{ produit.categorie }}
+
+                </span>
+
+                <h1>
+
+                    {{ produit.nomProduit }}
+
+                </h1>
+
+                <p class="price">
+
+                    <strong>Prix :</strong>
+
+                    {{ produit.prix }} DT
+
+                </p>
+
+                <form action="{{ path('panier_add', {'id': produit.id}) }}"
+                      method="post">
+                    <button type="submit" class="btn-cart">
+                        ajouter panier
+                    </button>
+                </form>
+
+                <div class="detail-actions">
+
+                    <a class="back-link"
+                       href="{{ path('app_client_interface') }}">
+
+                        Retour
+
+                    </a>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="related-products">
+
+            <h2>
+
+                Complétez votre routine
+
+            </h2>
+
+            <div class="products-grid">
+
+                {% for p in produits_similaires %}
+
+                    <div class="product-card">
+
+                        <a href="{{ path('produit_details', {'id': p.id}) }}">
+
+                            <img src="{{ asset(p.imagePath) }}"
+                                 alt="{{ p.nomProduit }}">
+
+                        </a>
+
+                        <h4>
+
+                            {{ p.nomProduit }}
+
+                        </h4>
+
+                        <p>
+
+                            {{ p.prix }} DT
+
+                        </p>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% include 'partials/_footer.html.twig' %}
+
+    <script src="{{ asset('js/menu.js') }}"></script>
+
+{% endblock %}

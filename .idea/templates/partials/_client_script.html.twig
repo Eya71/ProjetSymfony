@@ -1,0 +1,135 @@
+<script>
+    const menuBtn = document.getElementById('menuBtn');
+    const sideMenu = document.getElementById('sideMenu');
+    const closeMenu = document.getElementById('closeMenu');
+    const overlay = document.getElementById('overlay');
+    const logoutLink = document.getElementById('logoutLink');
+    const searchInput = document.getElementById('productSearch');
+    const productCards = document.querySelectorAll('.searchable-product');
+    const cartToast = document.getElementById('cartToast');
+    const addToCartForms = document.querySelectorAll('.add-to-cart-form');
+
+    let overlayCloseTimer;
+
+    function forceOverlayHidden() {
+        document.body.classList.remove('sidebar-open', 'menu-open');
+        document.body.style.removeProperty('overflow');
+
+        if (sideMenu) {
+            sideMenu.classList.remove('active');
+            sideMenu.setAttribute('aria-hidden', 'true');
+        }
+
+        if (!overlay) return;
+        overlay.removeAttribute('data-open');
+        overlay.classList.remove('active');
+        overlay.style.display = 'none';
+        overlay.style.opacity = '0';
+        overlay.style.visibility = 'hidden';
+        overlay.style.pointerEvents = 'none';
+        overlay.style.background = 'transparent';
+        overlay.style.zIndex = '-1';
+    }
+
+    function openMenu() {
+        if (!sideMenu) return;
+        window.clearTimeout(overlayCloseTimer);
+        document.body.classList.add('sidebar-open');
+        sideMenu.classList.add('active');
+        sideMenu.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeAll() {
+        window.clearTimeout(overlayCloseTimer);
+        forceOverlayHidden();
+    }
+
+    window.importySidebarClose = closeAll;
+    window.importySidebarOpen = openMenu;
+    closeAll();
+    window.addEventListener('pageshow', closeAll);
+
+    if (menuBtn) {
+        menuBtn.addEventListener('click', function(event) {
+            event.preventDefault();
+            openMenu();
+        });
+    }
+
+    if (closeMenu) {
+        closeMenu.addEventListener('click', function(event) {
+            event.preventDefault();
+            closeAll();
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', function(event) {
+            event.preventDefault();
+            closeAll();
+        });
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closeAll();
+        }
+    });
+
+    document.addEventListener('click', function(event) {
+        if (overlay && sideMenu && overlay.classList.contains('active') && !sideMenu.classList.contains('active')) {
+            closeAll();
+            return;
+        }
+
+        if (!document.body.classList.contains('sidebar-open')) {
+            return;
+        }
+
+        const clickedInsideSidebar = sideMenu && sideMenu.contains(event.target);
+        const clickedMenuButton = menuBtn && menuBtn.contains(event.target);
+
+        if (!clickedInsideSidebar && !clickedMenuButton) {
+            event.preventDefault();
+            event.stopPropagation();
+            closeAll();
+        }
+    }, true);
+
+    if (logoutLink) {
+        logoutLink.addEventListener('click', function(event) {
+            const confirmed = window.confirm('Est tu sure que tu veux te deconnecter ?');
+            if (!confirmed) {
+                event.preventDefault();
+            }
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase().trim();
+
+            productCards.forEach(function(card) {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? '' : 'none';
+            });
+        });
+    }
+
+    function showCartToast(message) {
+        if (!cartToast) return;
+        cartToast.textContent = message;
+        cartToast.classList.add('visible');
+        window.clearTimeout(showCartToast.timeoutId);
+        showCartToast.timeoutId = window.setTimeout(function() {
+            cartToast.classList.remove('visible');
+        }, 2200);
+    }
+
+    addToCartForms.forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            showCartToast('Produit ajoute dans le panier.');
+        });
+    });
+</script>
