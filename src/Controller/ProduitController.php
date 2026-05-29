@@ -24,14 +24,14 @@ final class ProduitController extends AbstractController
         }
 
         $userInfo = $connection->fetchAssociative(
-            'SELECT idphoto FROM vendeur WHERE username = :u',
+            'SELECT id_photo FROM vendeur WHERE username = :u',
             ['u' => $user->getUsername()]
         ) ?: [];
 
         return $this->render('produit/add.html.twig', [
             'username' => $user->getUsername(),
             'role' => $user->getLegacyRole(),
-            'photoUrl' => $imagePathResolver->profile($userInfo['idphoto'] ?? ''),
+            'photoUrl' => $imagePathResolver->profile($userInfo['id_photo'] ?? ''),
         ]);
     }
 

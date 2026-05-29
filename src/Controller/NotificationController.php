@@ -29,7 +29,7 @@ final class NotificationController extends AbstractController
         $items = $notif->recent($username, $role, 50);
 
         $userInfo = $connection->fetchAssociative(
-            'SELECT idphoto FROM '.($role === 'vendeur' ? 'vendeur' : 'client').' WHERE username = :u',
+            'SELECT id_photo FROM '.($role === 'vendeur' ? 'vendeur' : 'client').' WHERE username = :u',
             ['u' => $username]
         ) ?: [];
 
@@ -42,7 +42,7 @@ final class NotificationController extends AbstractController
             'username' => $username,
             'role' => $role,
             'items' => $items,
-            'photoUrl' => $imagePathResolver->profile($userInfo['idphoto'] ?? ''),
+            'photoUrl' => $imagePathResolver->profile($userInfo['id_photo'] ?? ''),
             'notifCount' => $notif->unreadCount($username, $role),
             'messageCount' => $messageCount,
         ]);
