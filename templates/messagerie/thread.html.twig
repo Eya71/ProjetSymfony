@@ -8,7 +8,11 @@
 {% endblock %}
 
 {% block body %}
-    {% include 'partials/_header_client.html.twig' with {'notifCount': notifCount, 'messageCount': messageCount, 'photoUrl': photoUrl} %}
+    {% if role == 'vendeur' %}
+        {% include 'partials/_header_vendeur.html.twig' with {'notifCount': notifCount, 'messageCount': messageCount, 'photoUrl': photoUrl} %}
+    {% else %}
+        {% include 'partials/_header_client.html.twig' with {'notifCount': notifCount, 'messageCount': messageCount, 'photoUrl': photoUrl} %}
+    {% endif %}
 
     <main class="thread-page">
         <div class="thread-container" id="threadContainer" data-deal-id="{{ deal.id_deal }}" data-current-user="{{ username }}">

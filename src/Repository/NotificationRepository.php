@@ -61,6 +61,25 @@ class NotificationRepository extends ServiceEntityRepository
             ->execute();
     }
 
+    public function markMessageNotificationsRead(string $username, string $role, int $dealId): void
+    {
+        $this->createQueryBuilder('n')
+            ->update()
+            ->set('n.is_read', ':read')
+            ->andWhere('n.recipient_username = :u')
+            ->andWhere('n.recipient_role = :r')
+            ->andWhere('n.type = :type')
+            ->andWhere('n.related_id = :deal')
+            ->andWhere('n.is_read = false')
+            ->setParameter('read', true)
+            ->setParameter('u', $username)
+            ->setParameter('r', $role)
+            ->setParameter('type', 'new_message')
+            ->setParameter('deal', $dealId)
+            ->getQuery()
+            ->execute();
+    }
+
     public function markAllReadFor(string $username, string $role): void
     {
         $this->createQueryBuilder('n')

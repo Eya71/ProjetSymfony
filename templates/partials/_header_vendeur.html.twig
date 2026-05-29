@@ -1,0 +1,55 @@
+<header class="top-header simple-client-header">
+
+    <button id="menuBtn" class="menu-btn" type="button" aria-label="Ouvrir le menu">
+        <i class="fa-solid fa-align-justify"></i>
+    </button>
+
+    <a class="logo" href="{{ path('vendeur_dashboard') }}" aria-label="Importy - Espace vendeur">
+        <img class="logo-img" src="{{ asset('files_profil/logo.png') }}" alt="Importy">
+    </a>
+
+    <a href="{{ path('vendeur_dashboard') }}" class="back-client-btn">
+        ← Retour espace vendeur
+    </a>
+
+    <div class="icons quick-actions">
+
+        <a href="{{ path('app_vendeur_commandes') }}" class="icon-item">
+            <i class="fa-solid fa-handshake" style="color:#B197FC;"></i>
+            <span>Mes commandes</span>
+        </a>
+
+        <a href="{{ path('app_vendeur_offres') }}" class="icon-item">
+            <i class="fa-solid fa-paper-plane" style="color:#B197FC;"></i>
+            <span>Mes offres</span>
+        </a>
+
+        <a href="{{ path('app_notifications_index') }}" class="icon-item">
+            <i class="fa-solid fa-bell" style="color:#74C0FC;"></i>
+            <span>Notifications</span>
+            <span class="badge {{ (notifCount is not defined or notifCount == 0) ? 'badge-hidden' : '' }}"
+                  data-notif-badge
+                  {{ (notifCount is not defined or notifCount == 0) ? 'style="display:none"' : '' }}>{{ notifCount|default(0) }}</span>
+        </a>
+
+        <a href="{{ path('app_messagerie_index') }}" class="icon-item">
+            <i class="fa-solid fa-envelope" style="color:#B197FC;"></i>
+            <span>Messages</span>
+            <span class="badge {{ (messageCount is not defined or messageCount == 0) ? 'badge-hidden' : '' }}"
+                  data-message-badge
+                  {{ (messageCount is not defined or messageCount == 0) ? 'style="display:none"' : '' }}>{{ messageCount|default(0) }}</span>
+        </a>
+
+        <a href="{{ path('app_vendeur_profile') }}" class="icon-item">
+            <i class="fa-regular fa-user" style="color:#74C0FC;"></i>
+            <span>Mon compte</span>
+        </a>
+
+        <a href="{{ path('app_logout') }}" class="icon-item">
+            <i class="fa-solid fa-right-from-bracket" style="color:#74C0FC;"></i>
+            <span>Logout</span>
+        </a>
+
+    </div>
+
+</header>
